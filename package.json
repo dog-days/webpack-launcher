@@ -1,0 +1,28 @@
+{
+  "version": "0.0.1",
+  "private": true,
+  "keywords": [
+    "webpack",
+    "scripts",
+    "webpack launcher",
+    "webpack-scripts"
+  ],
+  "devDependencies": {
+    "eslint": "5.10.0",
+    "husky": "^1.2.0",
+    "lerna": "^3.6.0",
+    "lint-staged": "^8.1.0",
+    "lodash": "4.17.11",
+    "prettier": "^1.15.3",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
+    "rimraf": "2.6.2"
+  },
+  "scripts": {
+    "test": "",
+    "postinstall": "node ./postinstall.js",
+    "bootstrap": "lerna bootstrap --ignore-scripts",
+    "build-publish": "lerna publish",
+    "prettier": "prettier --write './**/*(*.js|*.jsx|*.less|*.css)'"
+  }
+}
