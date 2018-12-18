@@ -13,6 +13,6 @@ const projectPackageJson = path.resolve(__dirname, '../package.json');
 commander
   .version(projectPackageJson.version)
   .command('start', 'Start the dev server.')
-  // .command('build', 'Production building.')
+  .command('build', 'Production building.')
   // .command('serve-build', 'Serve the static files in the build folder.')
   .parse(process.argv);
