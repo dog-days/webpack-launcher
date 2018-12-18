@@ -115,16 +115,19 @@ const defaultHotEntry = [
   require.resolve('webpack/hot/only-dev-server'),
 ];
 const createReactAppHotEntry = [require.resolve('react-dev-utils/webpackHotDevClient')];
+
 const entry = [
   // app 入口文件要放在其他入口文件之后
   webpackLauncherConfig.appIndexJs,
   //过滤无效的入口，如空字符、null、undefined 等
 ].filter(Boolean);
 
-if (webpackLauncherConfig.webpackHotDevClient === webpackHotDevClientsObj['create-react-app']) {
-  Array.prototype.unshift.apply(entry, createReactAppHotEntry);
-} else if (webpackLauncherConfig.webpackHotDevClient === webpackHotDevClientsObj.default) {
-  Array.prototype.unshift.apply(entry, defaultHotEntry);
+if (!isEnvProduction) {
+  if (webpackLauncherConfig.webpackHotDevClient === webpackHotDevClientsObj['create-react-app']) {
+    Array.prototype.unshift.apply(entry, createReactAppHotEntry);
+  } else if (webpackLauncherConfig.webpackHotDevClient === webpackHotDevClientsObj.default) {
+    Array.prototype.unshift.apply(entry, defaultHotEntry);
+  }
 }
 
 function getDevtoolSetting() {
