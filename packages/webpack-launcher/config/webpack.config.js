@@ -494,6 +494,13 @@ const config = {
     // makes the discovery automatic so you don't have to restart.
     // See https://github.com/facebook/create-react-app/issues/186
     !isEnvProduction && new WatchMissingNodeModulesPlugin(path.resolve('node_modules')),
+    isEnvProduction &&
+      new MiniCssExtractPlugin({
+        // Options similar to the same options in webpackOptions.output
+        // both options are optional
+        filename: 'static/css/[name].[contenthash:8].css',
+        chunkFilename: 'static/css/[name].[contenthash:8].chunk.css',
+      }),
     // prints more readable module names in the browser console on HMR updates
     // Generate a manifest file which contains a mapping of all asset filenames
     // to their corresponding output file so that tools can pick it up without
@@ -517,7 +524,8 @@ const config = {
         clear: true,
       },
     }),
-  ],
+    // 需要过滤掉无效的配置
+  ].filter(Boolean),
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
   node: {
