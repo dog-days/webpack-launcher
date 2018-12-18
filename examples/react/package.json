@@ -7,6 +7,7 @@
     "webpack-launcher": "^0.0.1"
   },
   "scripts": {
-    "start": "webpack-launcher start"
+    "start": "webpack-launcher start",
+    "build": "webpack-launcher build"
   }
 }
