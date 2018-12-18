@@ -89,6 +89,9 @@ function createMockMiddleware() {
           }
         }
       });
+    } else {
+      // 无 mock 配置，正常运行
+      next();
     }
   };
 }
