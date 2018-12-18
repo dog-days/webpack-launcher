@@ -38,6 +38,7 @@ function checkConfig(config) {
   }
   checkString('servedPath');
   checkString('appSrc');
+  checkString('appIndexJs');
   checkString('appBuild');
   checkString('appPublic');
   checkString('appHtml');
@@ -67,6 +68,7 @@ const lastConfig = Object.assign({}, defaultConfig, customConfig);
 checkConfig(lastConfig);
 
 lastConfig.appSrc = path.resolve(lastConfig.appSrc);
+lastConfig.appIndexJs = path.resolve(lastConfig.appIndexJs);
 lastConfig.appBuild = path.resolve(lastConfig.appBuild);
 lastConfig.appPublic = path.resolve(lastConfig.appPublic);
 lastConfig.appHtml = path.resolve(lastConfig.appHtml);

@@ -7,6 +7,7 @@ module.exports = {
   // 例如`/demo`，访问网站根目录demo文件中的web app
   servedPath: '/',
   appSrc: './src',
+  appIndexJs: './src/index.js',
   appBuild: './build',
   appPublic: './public',
   appHtml: './public/index.html',

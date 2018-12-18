@@ -117,7 +117,7 @@ const defaultHotEntry = [
 const createReactAppHotEntry = [require.resolve('react-dev-utils/webpackHotDevClient')];
 const entry = [
   // app 入口文件要放在其他入口文件之后
-  webpackLauncherConfig.appSrc,
+  webpackLauncherConfig.appIndexJs,
   //过滤无效的入口，如空字符、null、undefined 等
 ].filter(Boolean);
 
