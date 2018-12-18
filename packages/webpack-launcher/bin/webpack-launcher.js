@@ -8,11 +8,14 @@ const util = require('../utils/util');
 //检测node版本
 util.checkNodeVersion('v6.0.0');
 
-const projectPackageJson = path.resolve(__dirname, '../package.json');
+const projectPackageJson = require(path.resolve(__dirname, '../package.json'));
 
 commander
   .version(projectPackageJson.version)
   .command('start', 'Start the dev server.')
   .command('build', 'Production building.')
-  // .command('serve-build', 'Serve the static files in the build folder.')
+  .command(
+    'serve-build',
+    'Serve the static files in the build folder with mock or proxy if exiting.'
+  )
   .parse(process.argv);
