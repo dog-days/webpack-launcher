@@ -43,7 +43,7 @@ const lessModuleRegex = /\.module\.less$/;
 // publicPath: 'assets/', // 相对于 HTML 页面
 // publicPath: '../assets/', // 相对于 HTML 页面
 // publicPath: '', // 相对于 HTML 页面（目录相同）
-const publicPath = isEnvProduction ? `${webpackLauncherConfig.servedPath}/` : '/';
+const publicPath = isEnvProduction ? `${webpackLauncherConfig.servedPath}` : '/';
 // Some apps do not use client-side routing with pushState.
 // For these, "homepage" can be set to "." to enable relative asset paths.
 const shouldUseRelativeAssetPaths = publicPath === './';
