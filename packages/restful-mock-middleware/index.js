@@ -1,6 +1,6 @@
 'use strict';
 
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const bodyParser = require('body-parser');
 const multer = require('multer');
@@ -9,7 +9,8 @@ const _ = require('lodash');
 const pathToRegexp = require('path-to-regexp');
 
 // 上传的位置
-const upload = multer({ dest: path.resolve('mock/uploads') });
+const uploadDest = path.resolve('mock/uploads');
+const upload = multer({ dest: uploadDest });
 
 function _bodyParser(req, res, next) {
   // parse application/json
@@ -49,6 +50,12 @@ function createMockMiddleware() {
     const mockFolder = path.resolve('./mock');
     const mockConfigPath = path.resolve(mockFolder, '.mock.config.js');
     if (fs.existsSync(mockConfigPath)) {
+      if (fs.existsSync(uploadDest)) {
+        // 清空上传的文件
+        fs.emptyDir(uploadDest, err => {
+          if (err) return console.error(err);
+        });
+      }
       _bodyParser(req, res, function() {
         // 删除缓存，可动态加载配置文件
         delete require.cache[mockConfigPath];
