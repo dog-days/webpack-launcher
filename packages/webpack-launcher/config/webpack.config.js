@@ -473,10 +473,15 @@ const config = {
     new InterpolateHtmlPlugin(HtmlWebpackPlugin, { PUBLIC_URL }),
     // 定义全局变量 process.env.servedPath，可用于 react-router 中的 basename
     // 定义全局变量 process.env.NODE_ENV，可用于生产和开发环境的判断
-    new webpack.DefinePlugin({
-      'process.env.servedPath': JSON.stringify(webpackLauncherConfig.servedPath),
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-    }),
+    new webpack.DefinePlugin(
+      Object.assign(
+        {
+          'process.env.servedPath': JSON.stringify(webpackLauncherConfig.servedPath),
+          'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+        },
+        webpackLauncherConfig.globals
+      )
+    ),
     // 开启热替换功能，开发环境需要开启
     !isEnvProduction && new webpack.HotModuleReplacementPlugin(),
     // Watcher doesn't work well if you mistype casing in a path so we use
