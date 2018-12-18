@@ -1,0 +1,25 @@
+{
+  "name": "webpack-launcher-static",
+  "version": "0.0.1",
+  "homepage": "https://github.com/dog-days/webpack-launcher",
+  "repository": "https://github.com/dog-days/webpack-launcher",
+  "bugs": "https://github.com/dog-days/webpack-launcher/issues",
+  "author": "xianshannan <xianshannan@qq.com>",
+  "description": "A express static server which using restful mock middleware and proxy for frontend development.",
+  "main": "./index.js",
+  "bin": {
+    "webpack-launcher": "./bin/webpack-launcher-static.js"
+  },
+  "scripts": {
+    "test": ""
+  },
+  "dependencies": {
+    "express": "^4.16.4",
+    "connect-history-api-fallback": "^1.5.0",
+    "http-proxy-middleware": "^0.19.1",
+    "lodash": "4.17.11",
+    "react-dev-utils": "6.1.1",
+    "restful-mock-middleware": "^0.0.1"
+  },
+  "license": "ISC"
+}
