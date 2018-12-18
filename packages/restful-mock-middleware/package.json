@@ -1,0 +1,18 @@
+{
+  "name": "restful-mock-middleware",
+  "version": "0.0.1",
+  "homepage": "https://github.com/dog-days/webpack-launcher",
+  "repository": "https://github.com/dog-days/webpack-launcher",
+  "bugs": "https://github.com/dog-days/webpack-launcher/issues",
+  "author": "xianshannan <xianshannan@qq.com>",
+  "description": "A express restful mock middleware for frontend development.",
+  "scripts": {
+    "test": ""
+  },
+  "dependencies": {
+    "express": "^4.16.4",
+    "path-to-regexp": "^2.4.0",
+    "mockjs": "^1.0.1-beta3"
+  },
+  "license": "ISC"
+}

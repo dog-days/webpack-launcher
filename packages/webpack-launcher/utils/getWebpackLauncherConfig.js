@@ -44,7 +44,6 @@ function checkConfig(config) {
   checkString('host');
   checkNumber('port');
   checkPlainObject('proxy');
-  checkPlainObject('mock');
   checkPlainObject('alias');
   checkPlainObject('globals');
   checkBoolean('sourceMap');

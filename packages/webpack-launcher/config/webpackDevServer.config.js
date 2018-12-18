@@ -1,6 +1,8 @@
 // 大部分采用 create-react-app 配置
 'use strict';
 
+const createMockMiddleware = require('restful-mock-middleware');
+
 const webpackConfig = require('./webpack.config');
 const webpackLauncherConfig = require('../utils/getWebpackLauncherConfig');
 const { host, proxy, https, appPublic } = webpackLauncherConfig;
@@ -48,5 +50,7 @@ module.exports = {
   /**
    * 在服务内部的所有其他中间件之前， 提供执行自定义中间件的功能。 这可以用来配置自定义处理程序
    */
-  // before(app) {},
+  before(app) {
+    app.use(createMockMiddleware());
+  },
 };

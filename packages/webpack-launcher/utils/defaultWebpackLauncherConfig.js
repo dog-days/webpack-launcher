@@ -17,7 +17,6 @@ module.exports = {
   // https://webpack.docschina.org/configuration/dev-server/#devserver-proxy
   proxy: {},
   https: false,
-  mock: {},
   // 设置 webpack alias
   // https://webpack.docschina.org/configuration/resolve/#resolve-alias
   alias: {},
