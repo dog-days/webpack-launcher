@@ -1,8 +1,17 @@
+// 参考 create-react-app start
+// https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/scripts/start.js
 'use strict';
 console.log('Starting service...');
 
 process.env.NODE_ENV = 'development';
 process.env.BABEL_ENV = 'development';
+
+// Makes the script crash on unhandled rejections instead of silently
+// ignoring them. In the future, promise rejections that are not handled will
+// terminate the Node.js process with a non-zero exit code.
+process.on('unhandledRejection', err => {
+  throw err;
+});
 
 const openBrowser = require('react-dev-utils/openBrowser');
 const webpack = require('webpack');
