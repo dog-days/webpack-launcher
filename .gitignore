@@ -4,6 +4,7 @@
 .vscode/
 _book/
 node_modules/
+build/
 coverage/
 dist/
 lib/
