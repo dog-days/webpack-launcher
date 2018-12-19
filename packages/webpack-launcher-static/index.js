@@ -45,6 +45,7 @@ function runServer(host, port) {
   const app = express();
   const root = path.resolve(webpackLauncherConfig.appBuild);
   // 需要用在 historyApiFallback 之前
+  // 默认优先级高于 proxy
   app.use(createMockMiddleware());
   if (deafultWebpackLauncherConfig.proxy) {
     const proxy = proxyWebpackFormat(deafultWebpackLauncherConfig.proxy);
