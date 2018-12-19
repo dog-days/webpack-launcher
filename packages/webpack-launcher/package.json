@@ -31,6 +31,7 @@
     "eslint-plugin-react": "7.11.1",
     "rimraf": "2.6.2",
     "restful-mock-middleware": "^0.0.1",
+    "webpack-launcher-static": "^0.0.1",
     "archiver": "3.0.0",
     "bfj": "6.1.1",
     "body-parser": "^1.18.3",
