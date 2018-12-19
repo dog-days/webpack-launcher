@@ -5,8 +5,10 @@ const httpProxyMiddleware = require('http-proxy-middleware');
 /**
  * 从 webpack-dev-server 抽离的 proxy middleware
  * 不包含 wsProxy
+ * @param {Object | Array} 请看 https://webpack.js.org/configuration/dev-server/#devserver-proxy
+ * @param {Object} server express server 实例
  */
-function createProxyMiddleware(proxy) {
+function createProxyMiddleware(proxy, server) {
   if (proxy) {
     /**
      * Assume a proxy configuration specified as:
@@ -53,6 +55,7 @@ function createProxyMiddleware(proxy) {
       next();
       return;
     }
+    const websocketProxies = [];
     /**
      * Assume a proxy configuration specified as:
      * proxy: [
@@ -77,6 +80,10 @@ function createProxyMiddleware(proxy) {
           proxyConfig = proxyConfigOrCallback();
         } else {
           proxyConfig = proxyConfigOrCallback;
+        }
+
+        if (proxyConfig.ws) {
+          websocketProxies.push(proxyMiddleware);
         }
 
         if (typeof proxyConfigOrCallback === 'function') {
@@ -104,6 +111,7 @@ function createProxyMiddleware(proxy) {
         }
       };
     });
+
     if (proxyMiddlewares.length < 1) {
       // 空 proxy，需要运行 next，进行下一步
       next();
@@ -116,6 +124,11 @@ function createProxyMiddleware(proxy) {
           });
         };
       })(req, res, next);
+    }
+    if (server) {
+      websocketProxies.forEach(function(wsProxy) {
+        server.on('upgrade', wsProxy.upgrade);
+      });
     }
   };
 }
