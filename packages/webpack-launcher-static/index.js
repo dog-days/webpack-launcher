@@ -10,7 +10,7 @@ const historyApiFallback = require('connect-history-api-fallback');
 const openBrowser = require('react-dev-utils/openBrowser');
 const { choosePort } = require('react-dev-utils/WebpackDevServerUtils');
 const createMockMiddleware = require('restful-mock-middleware');
-const createProxyMiddleware = require('http-proxy-middleware');
+const createProxyMiddleware = require('webpack-dev-server-proxy-middlware');
 
 const customConfigAbsolutePath = path.resolve('.webpack.launcher.js');
 const deafultWebpackLauncherConfig = {
@@ -24,23 +24,7 @@ if (fs.existsSync(customConfigAbsolutePath)) {
   customConfig = require(customConfigAbsolutePath);
 }
 const webpackLauncherConfig = Object.assign(deafultWebpackLauncherConfig, customConfig);
-// 转换成 webpack proxy 模式
-function proxyWebpackFormat(proxy) {
-  if (!_.isPlainObject) {
-    throw new TypeError('Expected the proxy to be a plain object.');
-  }
-  const newProxy = {};
-  for (let path in proxy) {
-    if (_.isString(proxy[path])) {
-      newProxy[path] = {
-        target: proxy[path],
-      };
-    } else {
-      newProxy[path] = proxy;
-    }
-  }
-  return newProxy;
-}
+
 function runServer(host, port) {
   const app = express();
   const root = path.resolve(webpackLauncherConfig.appBuild);
@@ -48,10 +32,7 @@ function runServer(host, port) {
   // 默认优先级高于 proxy
   app.use(createMockMiddleware());
   if (deafultWebpackLauncherConfig.proxy) {
-    const proxy = proxyWebpackFormat(deafultWebpackLauncherConfig.proxy);
-    for (let path in proxy) {
-      app.use(path, createProxyMiddleware(proxy[path]));
-    }
+    app.use(createProxyMiddleware(deafultWebpackLauncherConfig.proxy));
   }
   // single page
   // 需要用在 express.static 前面
@@ -65,10 +46,11 @@ function runServer(host, port) {
     console.log(`  ${localUrlForTerminal}`);
   });
 }
-module.exports = function(host = webpackLauncherConfig.host, port = webpackLauncherConfig.port) {
-  choosePort(host, port)
+module.exports = function(port = webpackLauncherConfig.port) {
+  // 只处理 localhost 上的端口
+  choosePort('localhost', port)
     .then(port => {
-      runServer(host, port);
+      runServer('localhost', port);
     })
     .catch(err => {
       if (err && err.message) {
