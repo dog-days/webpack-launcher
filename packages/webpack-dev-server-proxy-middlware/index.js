@@ -104,14 +104,19 @@ function createProxyMiddleware(proxy) {
         }
       };
     });
-    // 多个 middleware 一起处理
-    proxyMiddlewares.reduce(function(a, b) {
-      return function(req, res, next) {
-        return a(req, res, function() {
-          b(req, res, next);
-        });
-      };
-    })(req, res, next);
+    if (proxyMiddlewares.length < 1) {
+      // 空 proxy，需要运行 next，进行下一步
+      next();
+    } else {
+      // 多个 middleware 一起处理
+      proxyMiddlewares.reduce(function(a, b) {
+        return function(req, res, next) {
+          return a(req, res, function() {
+            b(req, res, next);
+          });
+        };
+      })(req, res, next);
+    }
   };
 }
 
