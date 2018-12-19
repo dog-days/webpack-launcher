@@ -13,18 +13,20 @@ const uploadDest = path.resolve('mock/uploads');
 const upload = multer({ dest: uploadDest });
 
 function _bodyParser(req, res, next) {
-  // parse application/json
-  bodyParser.json()(req, res, function() {
-    bodyParser.raw()(req, res, function() {
-      bodyParser.text()(req, res, function() {
-        // parse application/x-www-form-urlencoded
-        bodyParser.urlencoded({ extended: true })(req, res, function() {
-          // 支持 multipart/form-data
-          upload.any()(req, res, next);
-        });
+  // 多个 middleware 一起处理
+  [
+    upload.any(),
+    bodyParser.urlencoded({ extended: true }),
+    bodyParser.text(),
+    bodyParser.raw(),
+    bodyParser.json(),
+  ].reduce(function(a, b) {
+    return function(req, res, next) {
+      return a(req, res, function() {
+        b(req, res, next);
       });
-    });
-  });
+    };
+  })(req, res, next);
 }
 /**
  * 创建 mock middleware
