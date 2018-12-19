@@ -2,6 +2,7 @@
 'use strict';
 
 const createMockMiddleware = require('restful-mock-middleware');
+const createProxyMiddleware = require('webpack-dev-server-proxy-middlware');
 
 const webpackConfig = require('./webpack.config');
 const webpackLauncherConfig = require('../utils/getWebpackLauncherConfig');
@@ -46,11 +47,16 @@ module.exports = {
   // 默认情况下，dev-server 通过 HTTP 提供服务。也可以选择带有 HTTPS 的 HTTP/2 提供服务：
   https,
   host: host || 'localhost',
-  proxy: Object.assign({}, proxy),
+  // 禁止使用 webpack-dev-server
+  // 使用独立的 proxy（从 webpack-dev-server 中抽离的）
+  // 用法不变
+  proxy: undefined,
   /**
-   * 在服务内部的所有其他中间件之前， 提供执行自定义中间件的功能。 这可以用来配置自定义处理程序
+   * 在服务内部的所有其他中间件之前， 提供执行自定义中间件的功能。
    */
-  before(app) {
+  before(app, server) {
+    // mock 优先级更高
     app.use(createMockMiddleware());
+    app.use(createProxyMiddleware(proxy, server));
   },
 };
