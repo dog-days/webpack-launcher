@@ -4,7 +4,7 @@
 const path = require('path');
 const commander = require('commander');
 
-const runServer = require('./index');
+const runServer = require('../index');
 
 const projectPackageJson = require(path.resolve(__dirname, '../package.json'));
 

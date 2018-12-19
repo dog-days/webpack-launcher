@@ -8,7 +8,7 @@
   "description": "A express static server which using restful mock middleware and proxy for frontend development.",
   "main": "./index.js",
   "bin": {
-    "webpack-launcher": "./bin/webpack-launcher-static.js"
+    "webpack-launcher-static": "./bin/webpack-launcher-static.js"
   },
   "scripts": {
     "test": ""
