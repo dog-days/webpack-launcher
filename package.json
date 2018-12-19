@@ -23,6 +23,15 @@
     "postinstall": "node ./postinstall.js",
     "bootstrap": "lerna bootstrap --ignore-scripts",
     "build-publish": "lerna publish",
-    "prettier": "prettier --write './**/*(*.js|*.jsx|*.less|*.css)'"
+    "prettier": "prettier --write './**/*(*.js|*.jsx|*.less|*.css)'",
+    "javascript": "npm start --prefix ./examples/javascript",
+    "javascript-build": "npm run build --prefix ./examples/javascript",
+    "javascript-serve-build": "npm run serve-build --prefix ./examples/javascript",
+    "react": "npm start --prefix ./examples/react",
+    "react-serve-build": "npm run serve-build --prefix ./examples/react",
+    "react-build": "npm run build --prefix ./examples/react",
+    "custom": "npm start --prefix ./examples/custom",
+    "custom-build": "npm run build --prefix ./examples/custom",
+    "custom-serve-build": "npm run serve-build --prefix ./examples/custom"
   }
 }
