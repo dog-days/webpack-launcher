@@ -1,6 +1,9 @@
 // 大部分源自，create-react-app start
 // https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/scripts/start.js
 'use strict';
+// 检测 node 版本
+require('webpack-launcher-utils/checkNodeVersion')();
+
 console.log('Starting service...');
 
 process.env.NODE_ENV = 'development';
@@ -12,24 +15,18 @@ process.env.BABEL_ENV = 'development';
 // 脚本未知原因终止运行，需要提示错误
 process.on('unhandledRejection', err => {
   // 解绑本地域名
-  if (host !== 'localhost') {
-    hostile.remove('127.0.0.1', host, function(err) {
-      if (err) {
-        console.log(chalk.yellow(err));
-      }
-      throw err;
-    });
-  } else {
+  removeLocalHost(host, function() {
     throw err;
-  }
+  });
 });
 
 const openBrowser = require('react-dev-utils/openBrowser');
-const chalk = require('chalk');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const { choosePort } = require('react-dev-utils/WebpackDevServerUtils');
-const hostile = require('hostile');
+const setLocalHost = require('webpack-launcher-utils/setLocalHost');
+const removeLocalHost = require('webpack-launcher-utils/removeLocalHost');
+const createSigntSigtermProcessEvent = require('webpack-launcher-utils/createSigntSigtermProcessEvent');
 
 const webpackConfig = require('../config/webpack.config');
 const webpackLauncherConfig = require('../utils/getWebpackLauncherConfig');
@@ -37,7 +34,7 @@ const webpackDevServerConfig = require('../config/webpackDevServer.config');
 const { printInstructions } = require('../utils/util');
 const createWebpackCompiler = require('../utils/createWebpackCompiler');
 
-let { host, port: defaultPort } = webpackLauncherConfig;
+let { host, port: defaultPort, https } = webpackLauncherConfig;
 
 // 实际上，在 Node 中执行的进程我们可以通过 process.stdout.isTTY 这个属性来判断它是否在终端（terminal）终端环境中执行。
 // 在后台执行，是不支持 chalk 终端颜色输出等。（使用 & npm run start ）
@@ -45,8 +42,9 @@ const isInteractive = process.stdout.isTTY;
 
 function runDevServer(port) {
   const compiler = createWebpackCompiler(webpack, webpackConfig, function(isFirstCompile) {
-    function openBrowserAntPrintInstructions() {
-      const localUrlForTerminal = `http://${host}:${port}`;
+    function openBrowserAntPrintInstructions(host, port, https) {
+      const protocol = https ? 'https' : 'http';
+      const localUrlForTerminal = `${protocol}://${host}:${port}`;
       if (isFirstCompile) {
         openBrowser(localUrlForTerminal);
       }
@@ -54,19 +52,13 @@ function runDevServer(port) {
         printInstructions({ localUrlForTerminal });
       }
     }
-    if (host !== 'localhost') {
-      // 绑定本地域名
-      hostile.set('127.0.0.1', host, function(err) {
-        if (err) {
-          console.log(chalk.yellow(err));
-          // 如果报错，直接使用默认的 localhost
-          host = 'localhost';
-        }
-        openBrowserAntPrintInstructions();
-      });
-    } else {
-      openBrowserAntPrintInstructions();
-    }
+    setLocalHost(host, function(err) {
+      if (err) {
+        // 如果报错，直接使用默认的 localhost
+        host = 'localhost';
+      }
+      openBrowserAntPrintInstructions(host, port, https);
+    });
   });
   const devServer = new WebpackDevServer(compiler, webpackDevServerConfig);
   // 启动 WebpackDevServer.
@@ -75,19 +67,11 @@ function runDevServer(port) {
       return console.log(err);
     }
   });
-  ['SIGINT', 'SIGTERM'].forEach(function(sig) {
-    // ctr + c 退出程序
-    process.on(sig, function() {
-      if (host !== 'localhost') {
-        // 解绑本地域名
-        hostile.remove('127.0.0.1', host, function(err) {
-          if (err) {
-            console.log(chalk.yellow(err));
-          }
-          devServer.close();
-          process.exit();
-        });
-      }
+  createSigntSigtermProcessEvent(function() {
+    // ctr + c 退出等
+    removeLocalHost(host, function() {
+      devServer.close();
+      process.exit();
     });
   });
 }
