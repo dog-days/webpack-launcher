@@ -3,10 +3,6 @@
 
 const path = require('path');
 const commander = require('commander');
-const util = require('../utils/util');
-
-//检测node版本
-util.checkNodeVersion('v6.0.0');
 
 const projectPackageJson = require(path.resolve(__dirname, '../package.json'));
 
