@@ -2,6 +2,7 @@
 
 /**
  * 从左到右合并 express middleware
+ * middlewares 的执行顺序从左到右，这个跟 redux 的 compose 的顺序相反（因为 next 回调）
  * @param {array} middlewares The express middlewares
  * @returns {Function} 返回一个组合的 express middleware
  * 例如 compose(f, g, h) 会组合为：
