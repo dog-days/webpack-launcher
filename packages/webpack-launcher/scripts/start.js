@@ -29,7 +29,7 @@ const removeLocalHost = require('webpack-launcher-utils/removeLocalHost');
 const createSigntSigtermProcessEvent = require('webpack-launcher-utils/createSigntSigtermProcessEvent');
 
 const webpackConfig = require('../config/webpack.config');
-const webpackLauncherConfig = require('../utils/getWebpackLauncherConfig');
+const webpackLauncherConfig = require('../utils/webpackLauncherConfig');
 const webpackDevServerConfig = require('../config/webpackDevServer.config');
 const { printInstructions } = require('../utils/util');
 const createWebpackCompiler = require('../utils/createWebpackCompiler');

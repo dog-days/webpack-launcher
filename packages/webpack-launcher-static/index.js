@@ -32,20 +32,8 @@ const openBrowser = require('react-dev-utils/openBrowser');
 const { choosePort } = require('react-dev-utils/WebpackDevServerUtils');
 const createMockMiddleware = require('restful-mock-middleware');
 const createProxyMiddleware = require('webpack-dev-server-proxy-middlware');
+const webpackLauncherConfig = require('webpack-launcher-utils/webpackLauncherConfig');
 
-const customConfigAbsolutePath = path.resolve('.webpack.launcher.js');
-const deafultWebpackLauncherConfig = {
-  host: 'localhost',
-  port: 5000,
-  appBuild: './build',
-  proxy: undefined,
-  https: false,
-};
-let customConfig = {};
-if (fs.existsSync(customConfigAbsolutePath)) {
-  customConfig = require(customConfigAbsolutePath);
-}
-const webpackLauncherConfig = Object.assign(deafultWebpackLauncherConfig, customConfig);
 /**
  * 创建 http 或者 https server（直接使用 webpack-dev-server 代码）
  * @param {Object} app express app 实例
@@ -130,16 +118,17 @@ function createServer(app, options = {}) {
   return server;
 }
 
-function runServer(host, port) {
+function runServer(options) {
+  let { host, port, proxy, appBuild, https: isHttps, servedPath } = options;
   const app = express();
   // 为了在 createMockMiddleware 中使用
-  const server = createServer(app, { https: webpackLauncherConfig.https });
-  const root = path.resolve(webpackLauncherConfig.appBuild);
+  const server = createServer(app, { https: isHttps });
+  const root = path.resolve(appBuild);
   // 需要用在 historyApiFallback 之前
   // 默认优先级高于 proxy
   app.use(createMockMiddleware());
-  if (deafultWebpackLauncherConfig.proxy) {
-    app.use(createProxyMiddleware(deafultWebpackLauncherConfig.proxy, server));
+  if (proxy) {
+    app.use(createProxyMiddleware(proxy, server));
   }
   // single page
   // 需要用在 express.static 前面
@@ -148,7 +137,7 @@ function runServer(host, port) {
   server.listen(port, function() {
     function openBrowserAntPrintInstructions(host, port, isHttps) {
       const protocol = isHttps ? 'https' : 'http';
-      const localUrlForTerminal = `${protocol}://${host}:${port}`;
+      const localUrlForTerminal = `${protocol}://${host}:${port}${servedPath}`;
       openBrowser(localUrlForTerminal);
       console.log(`You can now view the app in the browser.`);
       console.log();
@@ -159,7 +148,7 @@ function runServer(host, port) {
         // 如果报错，直接使用默认的 localhost
         host = 'localhost';
       }
-      openBrowserAntPrintInstructions(host, port, webpackLauncherConfig.https);
+      openBrowserAntPrintInstructions(host, port, isHttps);
     });
   });
   createSigntSigtermProcessEvent(function() {
@@ -170,11 +159,13 @@ function runServer(host, port) {
     });
   });
 }
-module.exports = function(port = webpackLauncherConfig.port) {
+module.exports = function(options) {
+  // 默认端口 5000
+  options = { ...webpackLauncherConfig, port: 5000, ...options };
   // 只处理 localhost 上的端口
-  choosePort('localhost', port)
+  choosePort('localhost', options.port)
     .then(port => {
-      runServer(webpackLauncherConfig.host, port);
+      runServer({ ...options, port });
     })
     .catch(err => {
       if (err && err.message) {

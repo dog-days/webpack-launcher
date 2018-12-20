@@ -17,9 +17,9 @@ const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const SimpleProgressPlugin = require('webpack-simple-progress-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { webpackHotDevClientsObj } = require('webpack-launcher-utils/webpackLauncherConfig/const');
 
-const webpackLauncherConfig = require('../utils/getWebpackLauncherConfig');
-const { webpackHotDevClientsObj } = require('../utils/const');
+const webpackLauncherConfig = require('../utils/webpackLauncherConfig');
 
 // 不是生成环境就当做开发环境
 const isEnvProduction = process.env.NODE_ENV === 'production';

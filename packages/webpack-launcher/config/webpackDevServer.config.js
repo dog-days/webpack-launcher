@@ -5,7 +5,7 @@ const createMockMiddleware = require('restful-mock-middleware');
 const createProxyMiddleware = require('webpack-dev-server-proxy-middlware');
 
 const webpackConfig = require('./webpack.config');
-const webpackLauncherConfig = require('../utils/getWebpackLauncherConfig');
+const webpackLauncherConfig = require('../utils/webpackLauncherConfig');
 const { host, proxy, https, appPublic } = webpackLauncherConfig;
 
 module.exports = {

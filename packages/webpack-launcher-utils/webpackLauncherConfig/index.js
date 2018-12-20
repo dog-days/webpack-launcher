@@ -73,16 +73,6 @@ lastConfig.appBuild = path.resolve(lastConfig.appBuild);
 lastConfig.appPublic = path.resolve(lastConfig.appPublic);
 lastConfig.appHtml = path.resolve(lastConfig.appHtml);
 
-if (!fs.existsSync(lastConfig.appPublic) && !customConfig.appPublic) {
-  // 没自定义 appPublic，且 appPublic 路径不存在，即使用者项目根目录找不到 appPublic 目录
-  // 那么使用默认的 appPublic 路径
-  lastConfig.appPublic = path.resolve(__dirname, './../template/public');
-}
-if (!fs.existsSync(lastConfig.appHtml) && !customConfig.appHtml) {
-  // 没自定义 appHtml，且 appHtml 路径不存在，即使用者项目根目录找不到 appHtml 文件
-  // 那么使用默认的 appHtml 路径
-  lastConfig.appHtml = path.resolve(__dirname, './../template/public/index.html');
-}
 // 保证为 /xxx/xx/ 格式
 lastConfig.servedPath =
   '/' +
