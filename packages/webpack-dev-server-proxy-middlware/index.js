@@ -1,6 +1,7 @@
 'use strict';
 
 const httpProxyMiddleware = require('http-proxy-middleware');
+const composeMiddlewares = require('webpack-launcher-utils/express-middleware-compose');
 
 /**
  * 从 webpack-dev-server 抽离的 proxy middleware
@@ -117,13 +118,7 @@ function createProxyMiddleware(proxy, server) {
       next();
     } else {
       // 多个 middleware 一起处理
-      proxyMiddlewares.reduce(function(a, b) {
-        return function(req, res, next) {
-          return a(req, res, function() {
-            b(req, res, next);
-          });
-        };
-      })(req, res, next);
+      composeMiddlewares(proxyMiddlewares)(req, res, next);
     }
     if (server) {
       websocketProxies.forEach(function(wsProxy) {

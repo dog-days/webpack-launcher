@@ -12,7 +12,8 @@
   "dependencies": {
     "express": "^4.16.4",
     "path-to-regexp": "^2.4.0",
-    "mockjs": "^1.0.1-beta3"
+    "mockjs": "^1.0.1-beta3",
+    "webpack-launcher-utils": "^0.0.1"
   },
   "license": "ISC"
 }

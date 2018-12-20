@@ -7,95 +7,89 @@ const multer = require('multer');
 const mockjs = require('mockjs');
 const _ = require('lodash');
 const pathToRegexp = require('path-to-regexp');
+const composeMiddlewares = require('webpack-launcher-utils/express-middleware-compose');
 
 // 上传的位置
 const uploadDest = path.resolve('mock/uploads');
 const upload = multer({ dest: uploadDest });
+const mockFolder = path.resolve('./mock');
+const mockConfigPath = path.resolve(mockFolder, '.mock.config.js');
 
-function _bodyParser(req, res, next) {
-  // 多个 middleware 一起处理
-  [
-    upload.any(),
-    bodyParser.urlencoded({ extended: true }),
-    bodyParser.text(),
-    bodyParser.raw(),
-    bodyParser.json(),
-  ].reduce(function(a, b) {
-    return function(req, res, next) {
-      return a(req, res, function() {
-        b(req, res, next);
-      });
-    };
-  })(req, res, next);
+function createMockMiddleware() {
+  return function(req, res, next) {
+    // 只有 mockConfig 配置文件存在才处理
+    if (fs.existsSync(mockConfigPath)) {
+      // 多个 middleware 一起处理
+      composeMiddlewares([
+        bodyParser.json(),
+        bodyParser.raw(),
+        bodyParser.text(),
+        bodyParser.urlencoded({ extended: true }),
+        upload.any(),
+        // mock 需要放在 body 解析之后
+        mockMiddleware,
+      ])(req, res, next);
+    } else {
+      next();
+    }
+  };
 }
+
 /**
  * 创建 mock middleware
  * 有两种 mock 方式（后续会逐渐移除老式的 mock 方式）：
  * 1.老式的文件路径 filePathMock 方式（为了兼容，保留这个用法）
  * 2.新的 routerMock 方式，跟 express 的 router 用法一致，推荐使用这种
- * @param {Object} {options} 配置项
- * @param {String} {options.mockContainerPath} 指定的 mock 文件夹路径
- * @returns
+ * @return express middleware
  */
-function createMockMiddleware() {
-  return function(req, res, next) {
-    // mockConfig 结构
-    // module.exports = {
-    //   filePathMock: {
-    //     '/keeper/v1/([^?#]*)': '/mock/$1.json',
-    //   },
-    //   下面配置方式，跟 express router 定义一致
-    //   routerMock: function(app){},
-    // };
-    // 或者只用 routerMock，可以省略 routerMock 字段，直接使用
-    // module.exports = function(app){}
-    const mockFolder = path.resolve('./mock');
-    const mockConfigPath = path.resolve(mockFolder, '.mock.config.js');
-    if (fs.existsSync(mockConfigPath)) {
-      if (fs.existsSync(uploadDest)) {
-        // 清空上传的文件
-        fs.emptyDir(uploadDest, err => {
-          if (err) return console.error(err);
-        });
+function mockMiddleware(req, res, next) {
+  if (fs.existsSync(uploadDest)) {
+    // 清空上传的文件
+    fs.emptyDir(uploadDest, err => {
+      if (err) return console.error(err);
+    });
+  }
+  // 删除缓存，可动态加载配置文件
+  delete require.cache[mockConfigPath];
+  const mockConfig = require(mockConfigPath);
+  // mockConfig 结构
+  // module.exports = {
+  //   filePathMock: {
+  //     '/keeper/v1/([^?#]*)': '/mock/$1.json',
+  //   },
+  //   下面配置方式，跟 express router 定义一致
+  //   routerMock: function(app){},
+  // };
+  // 或者只用 routerMock，可以省略 routerMock 字段，直接使用
+  // module.exports = function(app){}
+  if (_.isFunction(mockConfig)) {
+    // next 在 createMockApp 中处理
+    // 这种模式只有 routerMock
+    const mockApp = new createMockApp(req, res, next);
+    mockConfig(mockApp.getMockApp());
+    mockApp.run();
+  } else {
+    const nextWithFilePathMock = function() {
+      // 默认运行 next
+      let shouldRunNext = true;
+      // 匹配到 routerMock 则不再运行 filePathMock
+      if (mockConfig.filePathMock) {
+        // 兼容旧文件路径 mock 模式
+        shouldRunNext = createFilePathMock(mockConfig.filePathMock, mockFolder)(req, res);
       }
-      _bodyParser(req, res, function() {
-        // 删除缓存，可动态加载配置文件
-        delete require.cache[mockConfigPath];
-        const mockConfig = require(mockConfigPath);
-        if (_.isFunction(mockConfig)) {
-          // next 在 createMockApp 中处理
-          // 这种模式只有 routerMock
-          const mockApp = new createMockApp(req, res, next);
-          mockConfig(mockApp.getMockApp());
-          mockApp.run();
-        } else {
-          const nextWithFilePathMock = function() {
-            // 默认运行 next
-            let shouldRunNext = true;
-            // 匹配到 routerMock 则不再运行 filePathMock
-            if (mockConfig.filePathMock) {
-              // 兼容旧文件路径 mock 模式
-              shouldRunNext = createFilePathMock(mockConfig.filePathMock, mockFolder)(req, res);
-            }
-            if (shouldRunNext) {
-              next();
-            }
-          };
-          if (mockConfig.routerMock) {
-            // routerPathMock 优先级更高
-            const mockApp = new createMockApp(req, res, nextWithFilePathMock);
-            mockConfig.routerMock(mockApp.getMockApp());
-            mockApp.run();
-          } else {
-            nextWithFilePathMock();
-          }
-        }
-      });
+      if (shouldRunNext) {
+        next();
+      }
+    };
+    if (mockConfig.routerMock) {
+      // routerPathMock 优先级更高
+      const mockApp = new createMockApp(req, res, nextWithFilePathMock);
+      mockConfig.routerMock(mockApp.getMockApp());
+      mockApp.run();
     } else {
-      // 无 mock 配置，正常运行
-      next();
+      nextWithFilePathMock();
     }
-  };
+  }
 }
 
 const cache = {};
