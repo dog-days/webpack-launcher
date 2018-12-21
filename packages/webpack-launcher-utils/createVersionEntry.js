@@ -24,13 +24,14 @@ module.exports = function() {
     repository,
   };
   // eslint-disable-next-line
-  const versionDescription =
-    `\\r\\n${description}` +
-    `\\r\\nThe webp app is created at ${dateString}.` +
-    `\\r\\nThe app name is ${name}.` +
-    `\\r\\nThe version is ${version}.` +
-    `\\r\\nThe repository is ${repository}.` +
-    '\\r\\n';
+  const versionDescription = description
+    ? `\\r\\n${description}`
+    : '' +
+      `\\r\\nThe webp app is created at ${dateString}.` +
+      `\\r\\nThe app name is ${name}.` +
+      `\\r\\nThe version is ${version}.` +
+      `\\r\\nThe repository is ${repository ? repository : 'not defined'}.` +
+      '\\r\\n';
   let versionEntryContents = '// The file is created automatically,please do not rewrite it.\r\n';
   versionEntryContents += 'if(window){';
   versionEntryContents += `window.__version__='v${version}(${dateString})';`;
