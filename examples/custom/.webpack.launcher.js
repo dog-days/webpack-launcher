@@ -2,6 +2,7 @@
 const path = require('path');
 
 module.exports = {
+  buildGzip: true,
   host: 'webpack.launcher.com',
   proxy: {
     '/cigweb/v1/': 'http://cig.whtest.topvdn.com:57165/',
