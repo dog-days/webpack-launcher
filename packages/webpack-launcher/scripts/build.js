@@ -19,8 +19,10 @@ process.on('unhandledRejection', err => {
 
 const chalk = require('chalk');
 const fs = require('fs-extra');
+const path = require('path');
 const webpack = require('webpack');
 const bfj = require('bfj');
+const tar = require('tar');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
@@ -90,7 +92,39 @@ measureFileSizesBeforeBuild(webpackLauncherConfig.appBuild)
         // 需要 gzip 解压后才可以访问
         console.log('Creating the gzip files...');
         gzipJsCssFiles(stats, webpackLauncherConfig.appBuild);
-        console.log('Complete the gizp files creation.');
+        console.log(chalk.green('Complete the gizp files creation.'));
+      }
+      console.log();
+      if (webpackLauncherConfig.tar) {
+        function getTarFileName() {
+          const { name, version } = require(path.resolve('package.json'));
+          return webpackLauncherConfig.tar
+            .replace(/\{version\}/g, version)
+            .replace(/\{name\}/g, name);
+        }
+        const fileName = getTarFileName();
+        const filePath = path.resolve(fileName);
+
+        console.log(`Creating the ${fileName} file...`);
+
+        if (fs.existsSync(filePath)) {
+          // 先删除存在的 tar 文件
+          fs.removeSync(filePath);
+        }
+        tar
+          .c(
+            {
+              gzip: true,
+              file: filePath,
+            },
+            [path.relative('./', webpackLauncherConfig.appBuild)]
+          )
+          .then(_ => {
+            console.log(chalk.green(`Complete the ${fileName} file creation.`));
+          })
+          .catch(err => {
+            console.log(chalk.red(err));
+          });
       }
 
       // const appPackage = require(paths.appPackageJson);

@@ -50,6 +50,9 @@ function checkConfig(config) {
   checkBoolean('sourceMap');
   checkBoolean('https');
   checkBoolean('buildGzip');
+  if (config.tar !== undefined) {
+    checkString('tar');
+  }
 
   const webpackHotDevClients = Object.values(webpackHotDevClientsObj);
   if (!~webpackHotDevClients.indexOf(webpackHotDevClient)) {
