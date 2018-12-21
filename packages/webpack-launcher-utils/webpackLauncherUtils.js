@@ -3,8 +3,7 @@ const chalk = require('chalk');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const clearConsole = require('react-dev-utils/clearConsole');
 
-// 实际上，在 Node 中执行的进程我们可以通过 process.stdout.isTTY 这个属性来判断它是否在终端（terminal）终端环境中执行。
-// 可能在后台执行，是不支持 chalk 终端颜色输出等。
+// 为 false 时，在后台执行，很多场景不需要持终端输出等。（使用 npm run start & 会在后台运行）
 const isInteractive = process.stdout.isTTY;
 
 module.exports = {
