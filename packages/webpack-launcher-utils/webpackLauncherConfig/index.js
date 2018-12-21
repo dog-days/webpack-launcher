@@ -49,6 +49,7 @@ function checkConfig(config) {
   checkPlainObject('globals');
   checkBoolean('sourceMap');
   checkBoolean('https');
+  checkBoolean('buildGzip');
 
   const webpackHotDevClients = Object.values(webpackHotDevClientsObj);
   if (!~webpackHotDevClients.indexOf(webpackHotDevClient)) {

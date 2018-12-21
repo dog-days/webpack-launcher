@@ -25,6 +25,7 @@ const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
 const printBuildError = require('react-dev-utils/printBuildError');
+const gzipJsCssFiles = require('webpack-launcher-utils/gzipJsCssFiles');
 
 const webpackConfig = require('../config/webpack.config');
 const webpackLauncherConfig = require('../config/webpackLauncher.config');
@@ -84,6 +85,13 @@ measureFileSizesBeforeBuild(webpackLauncherConfig.appBuild)
         WARN_AFTER_CHUNK_GZIP_SIZE
       );
       console.log();
+      if (webpackLauncherConfig.buildGzip) {
+        // 如果开启打包文件 gzip 功能，打包后端 css 和 js 文件内容都是经过 gzip 后的内容
+        // 需要 gzip 解压后才可以访问
+        console.log('Creating the gzip files...');
+        gzipJsCssFiles(stats, webpackLauncherConfig.appBuild);
+        console.log('Complete the gizp files creation.');
+      }
 
       // const appPackage = require(paths.appPackageJson);
       // const publicUrl = paths.publicUrl;

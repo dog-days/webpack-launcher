@@ -19,6 +19,7 @@ const fs = require('fs');
 const http = require('http');
 const https = require('https');
 const express = require('express');
+const compression = require('compression');
 const spdy = require('spdy');
 const del = require('del');
 const semver = require('semver');
@@ -124,6 +125,17 @@ function runServer(options) {
   // 为了在 createMockMiddleware 中使用
   const server = createServer(app, { https: isHttps });
   const root = path.resolve(appBuild);
+  if (webpackLauncherConfig.buildGzip) {
+    // build js css 文件已经 gizp，只需要设置响应头
+    app.use(function(req, res, next) {
+      if (/\.(js|css)$/.test(req.url)) {
+        res.header('Content-Encoding', 'gzip');
+      }
+      next();
+    });
+  } else {
+    app.use(compression());
+  }
   // 需要用在 historyApiFallback 之前
   // 默认优先级高于 proxy
   app.use(createMockMiddleware());
@@ -134,6 +146,7 @@ function runServer(options) {
   // 需要用在 express.static 前面
   app.use(historyApiFallback());
   app.use(express.static(root));
+
   server.listen(port, function() {
     function openBrowserAntPrintInstructions(host, port, isHttps) {
       const protocol = isHttps ? 'https' : 'http';

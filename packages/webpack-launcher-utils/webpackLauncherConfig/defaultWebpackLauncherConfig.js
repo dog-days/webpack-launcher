@@ -31,4 +31,6 @@ module.exports = {
   // default: webpack默认的热替换热替换方式
   // create-react-app: craate-react-app 热替换方式
   webpackHotDevClient: 'create-react-app',
+  // 打包的 js、css 文件 gzip（后缀名还是 js 或者 css，但是内容已经 gzip）
+  buildGzip: false,
 };
