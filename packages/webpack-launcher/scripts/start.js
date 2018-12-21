@@ -24,15 +24,17 @@ const openBrowser = require('react-dev-utils/openBrowser');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const { choosePort } = require('react-dev-utils/WebpackDevServerUtils');
+const {
+  printDevServerInstructions,
+  createWebpackCompiler,
+} = require('webpack-launcher-utils/webpackLauncherUtils');
 const setLocalHost = require('webpack-launcher-utils/setLocalHost');
 const removeLocalHost = require('webpack-launcher-utils/removeLocalHost');
 const createSigntSigtermProcessEvent = require('webpack-launcher-utils/createSigntSigtermProcessEvent');
 
 const webpackConfig = require('../config/webpack.config');
-const webpackLauncherConfig = require('../utils/webpackLauncherConfig');
+const webpackLauncherConfig = require('../config/webpackLauncher.config');
 const webpackDevServerConfig = require('../config/webpackDevServer.config');
-const { printInstructions } = require('../utils/util');
-const createWebpackCompiler = require('../utils/createWebpackCompiler');
 
 let { host, port: defaultPort, https } = webpackLauncherConfig;
 
@@ -42,14 +44,14 @@ const isInteractive = process.stdout.isTTY;
 
 function runDevServer(port) {
   const compiler = createWebpackCompiler(webpack, webpackConfig, function(isFirstCompile) {
-    function openBrowserAntPrintInstructions(host, port, https) {
+    function openBrowserAndPrintInstructions(host, port, https) {
       const protocol = https ? 'https' : 'http';
       const localUrlForTerminal = `${protocol}://${host}:${port}`;
       if (isFirstCompile) {
         openBrowser(localUrlForTerminal);
       }
       if (isFirstCompile || isInteractive) {
-        printInstructions({ localUrlForTerminal });
+        printDevServerInstructions({ localUrlForTerminal });
       }
     }
     setLocalHost(host, function(err) {
@@ -57,7 +59,7 @@ function runDevServer(port) {
         // 如果报错，直接使用默认的 localhost
         host = 'localhost';
       }
-      openBrowserAntPrintInstructions(host, port, https);
+      openBrowserAndPrintInstructions(host, port, https);
     });
   });
   const devServer = new WebpackDevServer(compiler, webpackDevServerConfig);

@@ -27,7 +27,7 @@ const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
 const printBuildError = require('react-dev-utils/printBuildError');
 
 const webpackConfig = require('../config/webpack.config');
-const webpackLauncherConfig = require('../utils/getWebpackLauncherConfig');
+const webpackLauncherConfig = require('../config/webpackLauncher.config');
 
 const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;

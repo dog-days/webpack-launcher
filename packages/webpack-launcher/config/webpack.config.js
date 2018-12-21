@@ -19,7 +19,7 @@ const SimpleProgressPlugin = require('webpack-simple-progress-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { webpackHotDevClientsObj } = require('webpack-launcher-utils/webpackLauncherConfig/const');
 
-const webpackLauncherConfig = require('../utils/webpackLauncherConfig');
+const webpackLauncherConfig = require('../config/webpackLauncher.config');
 
 // 不是生成环境就当做开发环境
 const isEnvProduction = process.env.NODE_ENV === 'production';
