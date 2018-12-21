@@ -18,6 +18,7 @@ const ManifestPlugin = require('webpack-manifest-plugin');
 const SimpleProgressPlugin = require('webpack-simple-progress-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { webpackHotDevClientsObj } = require('webpack-launcher-utils/webpackLauncherConfig/const');
+const createVersionEntry = require('webpack-launcher-utils/createVersionEntry');
 
 const webpackLauncherConfig = require('../config/webpackLauncher.config');
 
@@ -117,6 +118,7 @@ const defaultHotEntry = [
 const createReactAppHotEntry = [require.resolve('react-dev-utils/webpackHotDevClient')];
 
 const entry = [
+  createVersionEntry(),
   // app 入口文件要放在其他入口文件之后
   webpackLauncherConfig.appIndexJs,
   //过滤无效的入口，如空字符、null、undefined 等
