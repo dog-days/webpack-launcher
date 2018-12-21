@@ -7,7 +7,7 @@ const multer = require('multer');
 const mockjs = require('mockjs');
 const _ = require('lodash');
 const pathToRegexp = require('path-to-regexp');
-const composeMiddlewares = require('webpack-launcher-utils/express-middleware-compose');
+const composeMiddlewares = require('webpack-launcher-utils/expressMiddlewareCompose');
 
 // 上传的位置
 const uploadDest = path.resolve('mock/uploads');

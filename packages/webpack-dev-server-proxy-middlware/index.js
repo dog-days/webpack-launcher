@@ -1,7 +1,7 @@
 'use strict';
 
 const httpProxyMiddleware = require('http-proxy-middleware');
-const composeMiddlewares = require('webpack-launcher-utils/express-middleware-compose');
+const composeMiddlewares = require('webpack-launcher-utils/expressMiddlewareCompose');
 
 /**
  * 从 webpack-dev-server 抽离的 proxy middleware
