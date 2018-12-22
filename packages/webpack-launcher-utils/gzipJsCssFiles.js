@@ -6,12 +6,7 @@ const zlib = require('zlib');
 const path = require('path');
 
 function canReadAsset(asset) {
-  // 采用 create-react-app 的，虽然目前还没有
-  return (
-    /\.(js|css)$/.test(asset) &&
-    !/service-worker\.js/.test(asset) &&
-    !/precache-manifest\.[0-9a-f]+\.js/.test(asset)
-  );
+  return /\.(js|css)$/.test(asset);
 }
 // function getFileNameByPath(filePath) {
 //   // 首先转换为 url "/" 路径模式，兼容 windows
