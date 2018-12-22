@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const mockjs = require('mockjs');
 const _ = require('lodash');
+const chalk = require('chalk');
 const pathToRegexp = require('path-to-regexp');
 const composeMiddlewares = require('webpack-launcher-utils/expressMiddlewareCompose');
 
@@ -49,9 +50,16 @@ function mockMiddleware(req, res, next) {
       if (err) return console.error(err);
     });
   }
-  // 删除缓存，可动态加载配置文件
-  delete require.cache[mockConfigPath];
-  const mockConfig = require(mockConfigPath);
+  let mockConfig;
+  try {
+    // 删除缓存，可动态加载配置文件
+    delete require.cache[mockConfigPath];
+    mockConfig = require(mockConfigPath);
+  } catch (err) {
+    console.log(chalk.red(err.stack));
+    next();
+    return;
+  }
   // mockConfig 结构
   // module.exports = {
   //   filePathMock: {
@@ -201,7 +209,12 @@ class createMockApp {
       ) {
         res.sendStatus(405);
       } else {
-        result(req, res);
+        try {
+          result(req, res);
+        } catch (err) {
+          // 语法错误等
+          res.status(500).send(err.stack);
+        }
       }
     } else {
       this.next();
