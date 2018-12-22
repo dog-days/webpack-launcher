@@ -2,7 +2,8 @@
 const path = require('path');
 
 module.exports = {
-  tar: '{name}-{version}.tar.gz',
+  sourceMap: false,
+  tar: '{name}-v{version}.tar.gz',
   buildGzip: true,
   host: 'webpack.launcher.com',
   proxy: {
