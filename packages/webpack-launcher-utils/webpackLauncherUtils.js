@@ -98,4 +98,12 @@ module.exports = {
     console.log(`To create a production build, use ${chalk.cyan('npm run build')}.`);
     console.log();
   },
+  printBuildInstructions() {
+    console.log();
+    console.log(`The ${chalk.cyan('build')} folder is ready to be deployed.`);
+    console.log(`You can run the static server to check the built app:`);
+    console.log();
+    console.log(`  ${chalk.cyan('npm')} run serve-build`);
+    console.log();
+  },
 };

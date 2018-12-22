@@ -28,6 +28,7 @@ const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
 const printBuildError = require('react-dev-utils/printBuildError');
 const gzipJsCssFiles = require('webpack-launcher-utils/gzipJsCssFiles');
+const { printBuildInstructions } = require('webpack-launcher-utils/webpackLauncherUtils');
 
 const webpackConfig = require('../config/webpack.config');
 const webpackLauncherConfig = require('../config/webpackLauncher.config');
@@ -86,16 +87,16 @@ measureFileSizesBeforeBuild(webpackLauncherConfig.appBuild)
         WARN_AFTER_BUNDLE_GZIP_SIZE,
         WARN_AFTER_CHUNK_GZIP_SIZE
       );
-      console.log();
       if (webpackLauncherConfig.buildGzip) {
+        console.log();
         // 如果开启打包文件 gzip 功能，打包后端 css 和 js 文件内容都是经过 gzip 后的内容
         // 需要 gzip 解压后才可以访问
         console.log('Creating the gzip files...');
         gzipJsCssFiles(stats, webpackLauncherConfig.appBuild);
         console.log(chalk.green('Complete the gizp files creation.'));
       }
-      console.log();
       if (webpackLauncherConfig.tar) {
+        console.log();
         function getTarFileName() {
           const { name, version } = require(path.resolve('package.json'));
           return webpackLauncherConfig.tar
@@ -122,17 +123,15 @@ measureFileSizesBeforeBuild(webpackLauncherConfig.appBuild)
           )
           .then(_ => {
             console.log(chalk.green(`Complete the ${fileName} file creation.`));
+            printBuildInstructions();
           })
           .catch(err => {
+            printBuildInstructions();
             console.log(chalk.red(err));
           });
+      } else {
+        printBuildInstructions();
       }
-
-      // const appPackage = require(paths.appPackageJson);
-      // const publicUrl = paths.publicUrl;
-      // const publicPath = config.output.publicPath;
-      // const buildFolder = path.relative(process.cwd(), paths.appBuild);
-      // printHostingInstructions(appPackage, publicUrl, publicPath, buildFolder, false);
     },
     err => {
       console.log(chalk.red('Failed to compile.\n'));
