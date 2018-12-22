@@ -104,6 +104,7 @@ measureFileSizesBeforeBuild(webpackLauncherConfig.appBuild)
         }
         const fileName = getTarFileName();
         const filePath = path.resolve(fileName);
+        const shouldGzip = !!~webpackLauncherConfig.tar.match(/.*\.([^.]+)/)[1].indexOf('gz');
 
         console.log(`Creating the ${fileName} file...`);
 
@@ -114,7 +115,7 @@ measureFileSizesBeforeBuild(webpackLauncherConfig.appBuild)
         tar
           .c(
             {
-              gzip: true,
+              gzip: shouldGzip,
               file: filePath,
             },
             [path.relative('./', webpackLauncherConfig.appBuild)]
