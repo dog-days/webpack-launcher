@@ -32,6 +32,9 @@
     "react-build": "npm run build --prefix ./examples/react",
     "custom": "npm start --prefix ./examples/custom",
     "custom-build": "npm run build --prefix ./examples/custom",
-    "custom-serve-build": "npm run serve-build --prefix ./examples/custom"
+    "custom-serve-build": "npm run serve-build --prefix ./examples/custom",
+    "eject": "npm start --prefix ./examples/eject",
+    "eject-build": "npm run build --prefix ./examples/eject",
+    "eject-serve-build": "npm run serve-build --prefix ./examples/eject"
   }
 }
