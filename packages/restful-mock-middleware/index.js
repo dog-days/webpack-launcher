@@ -53,7 +53,11 @@ function mockMiddleware(req, res, next) {
   let mockConfig;
   try {
     // 删除缓存，可动态加载配置文件
-    delete require.cache[mockConfigPath];
+    Object.keys(require.cache).forEach(file => {
+      if (!!~file.indexOf(mockFolder)) {
+        delete require.cache[file];
+      }
+    });
     mockConfig = require(mockConfigPath);
   } catch (err) {
     console.log(chalk.red(err.stack));
