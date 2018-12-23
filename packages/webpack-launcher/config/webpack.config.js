@@ -266,9 +266,11 @@ const config = {
             options: {
               formatter: require.resolve('react-dev-utils/eslintFormatter'),
               eslintPath: require.resolve('eslint'),
+              // @remove-on-eject-begin
               // 默认的 eslint 配置
               // .eslintrc.* 优先级更高，配置会被 merge
               baseConfig: require('./eslint.config.js'),
+              // @remove-on-eject-end
             },
             loader: require.resolve('eslint-loader'),
           },
@@ -299,7 +301,9 @@ const config = {
             include: webpackLauncherConfig.appSrc,
             loader: require.resolve('babel-loader'),
             options: {
+              // @remove-on-eject-begin
               configFile: path.resolve(__dirname, './babel.config.js'),
+              // @remove-on-eject-end
               // This is a feature of `babel-loader` for webpack (not Babel itself).
               // It enables caching results in ./node_modules/.cache/babel-loader/
               // directory for faster rebuilds.

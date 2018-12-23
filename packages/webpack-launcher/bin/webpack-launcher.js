@@ -8,6 +8,7 @@ const projectPackageJson = require(path.resolve(__dirname, '../package.json'));
 
 commander
   .version(projectPackageJson.version)
+  .command('eject', 'Eject config and script files to the project.')
   .command('start', 'Start the dev server.')
   .command('build', 'Production building.')
   .command(
