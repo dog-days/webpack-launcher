@@ -1,3 +1,7 @@
+// .mock.config.js 结构 module.exports = function(moacApp){}
+// mockApp 只提供了 get、post、patch、put、delete、all，6个 api
+// 用法跟 express app 一致（没有 next）
+// res.send、res.json、res.jsonp 三种方式都支持 mock.js 语法。
 'use strict';
 
 const fs = require('fs-extra');
@@ -10,12 +14,38 @@ const chalk = require('chalk');
 const pathToRegexp = require('path-to-regexp');
 const composeMiddlewares = require('webpack-launcher-utils/expressMiddlewareCompose');
 
+let mockFolder = path.resolve('./mock');
 // 文件上传的位置
-const uploadDest = path.resolve('mock/uploads');
-const mockFolder = path.resolve('./mock');
-const mockConfigFile = path.resolve(mockFolder, '.mock.config.js');
+let uploadDest = path.resolve(mockFolder, './uploads');
+let mockConfigFile = path.resolve(mockFolder, '.mock.config.js');
+let mockConfigFormatter = function(mockConfig) {
+  return mockConfig;
+};
 
-function createMockMiddleware() {
+/**
+ * 创建 express mock middleware
+ * @param {Object} options
+ * @param {Object} options.mockFolder mock 文件的存储位置，所有的 mock 文件统一放在这个文件夹下
+ * @param {Object} options.uploadDest mock 上传文件临时存储的位置
+ * 默认为 ./mock/uploads
+ * @param {Object} options.mockConfigFile 绝对路径 undefined 默认使用当前项目
+ * ./mock/.mock.config.js
+ * @param {Object} options.mockConfigFormatter 格式化 mockConfigFile 为
+ * .mock.config.js 的格式
+ */
+function createMockMiddleware(options = {}) {
+  if (options.mockConfigFile) {
+    mockConfigFile = options.mockConfigFile;
+  }
+  if (options.mockFolder) {
+    mockFolder = options.mockFolder;
+  }
+  if (options.uploadDest) {
+    uploadDest = options.uploadDest;
+  }
+  if (options.mockConfigFormatter) {
+    mockConfigFormatter = options.mockConfigFormatter;
+  }
   return function(req, res, next) {
     // 只有 mockConfig 配置文件存在才处理
     if (fs.existsSync(mockConfigFile)) {
@@ -54,28 +84,21 @@ function mockMiddleware(req, res, next) {
   }
   let mockConfig;
   try {
-    // 删除缓存，可动态加载配置文件
+    // 删除 mock 配置文件 js require 缓存
+    delete require.cache[mockConfigFile];
+    // 删除 mock 文件夹的 js require 缓存，可动态 mock 文件夹下的所有 js 文件
     Object.keys(require.cache).forEach(file => {
       if (!!~file.indexOf(mockFolder)) {
         delete require.cache[file];
       }
     });
-    mockConfig = require(mockConfigFile);
+    mockConfig = mockConfigFormatter(require(mockConfigFile));
   } catch (err) {
     console.log(chalk.red(err.stack));
     next();
     return;
   }
-  // mockConfig 结构
-  // module.exports = {
-  //   filePathMock: {
-  //     '/keeper/v1/([^?#]*)': '/mock/$1.json',
-  //   },
-  //   下面配置方式，跟 express router 定义一致
-  //   routerMock: function(app){},
-  // };
-  // 或者只用 routerMock，可以省略 routerMock 字段，直接使用
-  // module.exports = function(app){}
+
   if (_.isFunction(mockConfig)) {
     // next 在 createMockApp 中处理
     // 这种模式只有 routerMock
@@ -83,6 +106,14 @@ function mockMiddleware(req, res, next) {
     mockConfig(mockApp.getMockApp());
     mockApp.run();
   } else {
+    // 兼容模式 .mock.config.js 结构
+    // 后续会移除，可以不理会
+    // module.exports = {
+    //   filePathMock: {
+    //     '/keeper/v1/([^?#]*)': '/mock/$1.json',
+    //   },
+    //   routerMock: function(app){},
+    // };
     const nextWithFilePathMock = function() {
       // 默认运行 next
       let shouldRunNext = true;
