@@ -37,8 +37,8 @@ inquirer
       './scripts/start.js',
       './scripts/build.js',
       './scripts/serve-build.js',
-      './template/public/index.html',
-      './template/public/favicon.ico',
+      './public/index.html',
+      './public/favicon.ico',
     ];
     shouldCopyedfileRelativePaths.forEach(relativeFilePath => {
       // 检查文件是否存储，只要其中存在立即中断 eject
@@ -64,7 +64,7 @@ inquirer
     fs.copySync(path.resolve(__dirname, '../template/public'), copyedPublicFolder);
 
     shouldCopyedfileRelativePaths.forEach(relativeFilePath => {
-      if (!!~relativeFilePath.indexOf('./template/public')) {
+      if (!!~relativeFilePath.indexOf('./public/')) {
         // public 直接复制
         console.log(`  Adding ${chalk.cyan(relativeFilePath)}`);
         return;
