@@ -12,21 +12,21 @@ const composeMiddlewares = require('webpack-launcher-utils/expressMiddlewareComp
 
 // 上传的位置
 const uploadDest = path.resolve('mock/uploads');
-const upload = multer({ dest: uploadDest });
+const uploadBodyParser = multer({ dest: uploadDest });
 const mockFolder = path.resolve('./mock');
-const mockConfigPath = path.resolve(mockFolder, '.mock.config.js');
+const mockConfigFile = path.resolve(mockFolder, '.mock.config.js');
 
 function createMockMiddleware() {
   return function(req, res, next) {
     // 只有 mockConfig 配置文件存在才处理
-    if (fs.existsSync(mockConfigPath)) {
+    if (fs.existsSync(mockConfigFile)) {
       // 多个 middleware 一起处理
       composeMiddlewares([
         bodyParser.json(),
         bodyParser.raw(),
         bodyParser.text(),
         bodyParser.urlencoded({ extended: true }),
-        upload.any(),
+        uploadBodyParser.any(),
         // mock 需要放在 body 解析之后
         mockMiddleware,
       ])(req, res, next);
@@ -58,7 +58,7 @@ function mockMiddleware(req, res, next) {
         delete require.cache[file];
       }
     });
-    mockConfig = require(mockConfigPath);
+    mockConfig = require(mockConfigFile);
   } catch (err) {
     console.log(chalk.red(err.stack));
     next();
