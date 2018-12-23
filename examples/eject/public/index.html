@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"
+    />
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
+    <title>Webpack Launcher App</title>
+    <style>
+      #__webpack-launcher-loading-con {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        bottom: 0px;
+        left: 0px;
+        background-color: rgb(242, 242, 242);
+        z-index: 999;
+      }
+      #__webpack-launcher-loading-con .ant-spin {
+        width: 100%;
+        color: #108ee9;
+        vertical-align: middle;
+        text-align: center;
+        -webkit-transition: -webkit-transform 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
+        transition: -webkit-transform 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
+        transition: transform 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
+        transition: transform 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86),
+          -webkit-transform 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
+        font-size: 14px;
+        display: inline-block;
+        position: absolute;
+        top: 40%;
+        margin-top: -80px;
+      }
+      #__webpack-launcher-loading-con .ant-spin-dot {
+        display: inline-block;
+        width: 45px;
+        height: 45px;
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+        -webkit-animation: antRotate 1.2s infinite linear;
+        animation: antRotate 1.2s infinite linear;
+      }
+      #__webpack-launcher-loading-con .ant-spin-dot i {
+        width: 22px;
+        height: 22px;
+        border-radius: 100%;
+        background-color: #108ee9;
+        -webkit-transform: scale(0.75);
+        -ms-transform: scale(0.75);
+        transform: scale(0.75);
+        display: block;
+        position: absolute;
+        opacity: 0.3;
+        -webkit-animation: antSpinMove 1s infinite linear alternate;
+        animation: antSpinMove 1s infinite linear alternate;
+        -webkit-transform-origin: 50% 50%;
+        -ms-transform-origin: 50% 50%;
+        transform-origin: 50% 50%;
+      }
+      #__webpack-launcher-loading-con .ant-spin-dot i:first-child {
+        left: 0;
+        top: 0;
+      }
+      #__webpack-launcher-loading-con .ant-spin-dot i:nth-child(2) {
+        right: 0;
+        top: 0;
+        -webkit-animation-delay: 0.4s;
+        animation-delay: 0.4s;
+      }
+      #__webpack-launcher-loading-con .ant-spin-dot i:nth-child(3) {
+        right: 0;
+        bottom: 0;
+        -webkit-animation-delay: 0.8s;
+        animation-delay: 0.8s;
+      }
+      #__webpack-launcher-loading-con .ant-spin-dot i:nth-child(4) {
+        left: 0;
+        bottom: 0;
+        -webkit-animation-delay: 1.2s;
+        animation-delay: 1.2s;
+      }
+      #__webpack-launcher-loading-con .ant-spin .ant-spin-text {
+        display: block;
+        padding-top: 6px;
+      }
+      #__webpack-launcher-loading-con .browser-error {
+        color: red;
+      }
+      @keyframes antSpinMove {
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes antRotate {
+        to {
+          -webkit-transform: rotate(405deg);
+          transform: rotate(405deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root">
+      <!--The div will be repalce by app contents.-->
+      <div id="__webpack-launcher-loading-con">
+        <div class="ant-spin ant-spin-spinning">
+          <span class="ant-spin-dot"> <i></i> <i></i> <i></i> <i></i> </span>
+          <div class="ant-spin-text">
+            Loading... <br />
+            <br />
+            <!--[if lt IE 11]>
+              <span class="browser-error">
+                当前 IE版本低于 IE11，请使用 IE11！ <br />
+                <br />
+                建议使用谷歌、火狐等主流浏览器。
+              </span>
+            <![endif]-->
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
