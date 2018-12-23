@@ -10,9 +10,8 @@ const chalk = require('chalk');
 const pathToRegexp = require('path-to-regexp');
 const composeMiddlewares = require('webpack-launcher-utils/expressMiddlewareCompose');
 
-// 上传的位置
+// 文件上传的位置
 const uploadDest = path.resolve('mock/uploads');
-const uploadBodyParser = multer({ dest: uploadDest });
 const mockFolder = path.resolve('./mock');
 const mockConfigFile = path.resolve(mockFolder, '.mock.config.js');
 
@@ -20,6 +19,9 @@ function createMockMiddleware() {
   return function(req, res, next) {
     // 只有 mockConfig 配置文件存在才处理
     if (fs.existsSync(mockConfigFile)) {
+      // 会在创建 ./mock/uploads 文件夹
+      // 所有只有 mock 的时候触发
+      const uploadBodyParser = multer({ dest: uploadDest });
       // 多个 middleware 一起处理
       composeMiddlewares([
         bodyParser.json(),
