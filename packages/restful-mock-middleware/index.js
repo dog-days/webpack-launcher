@@ -25,12 +25,12 @@ let mockConfigFormatter = function(mockConfig) {
 /**
  * 创建 express mock middleware
  * @param {Object} options
- * @param {Object} options.mockFolder mock 文件的存储位置，所有的 mock 文件统一放在这个文件夹下
+ * @param {String} options.mockFolder mock 文件的存储位置，所有的 mock 文件统一放在这个文件夹下
  * @param {Object} options.uploadDest mock 上传文件临时存储的位置
  * 默认为 ./mock/uploads
- * @param {Object} options.mockConfigFile 绝对路径 undefined 默认使用当前项目
+ * @param {String} options.mockConfigFile 绝对路径 undefined 默认使用当前项目
  * ./mock/.mock.config.js
- * @param {Object} options.mockConfigFormatter 格式化 mockConfigFile 为
+ * @param {Function} options.mockConfigFormatter 格式化 mockConfigFile 为
  * .mock.config.js 的格式
  */
 function createMockMiddleware(options = {}) {
