@@ -87,6 +87,7 @@ module.exports = {
     return compiler;
   },
   printDevServerInstructions({ localUrlForTerminal }) {
+    console.log(chalk.green('Compiled successfully!'));
     console.log();
     console.log(`You can now view the app in the browser.`);
     console.log();
