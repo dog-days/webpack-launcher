@@ -9,7 +9,11 @@ const moment = require('moment');
 let versionPath = path.resolve(__dirname, '.projectVersionEntry.js');
 
 module.exports = function() {
-  const { name, version, description, repository } = require(path.resolve('package.json'));
+  let { name, version, description, repository } = require(path.resolve('package.json'));
+
+  if (typeof repository === 'object') {
+    repository = repository.url;
+  }
 
   if (!version) {
     console.error(chalk.red('The package verion in package.json is required.'));
