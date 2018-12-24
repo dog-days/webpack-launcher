@@ -215,7 +215,7 @@ class createMockApp {
       strict: false,
       sensitive: true,
     });
-    const match = regexp.exec(this.req.url.slice(1));
+    const match = regexp.exec(this.req.url);
 
     if (!match || this.hasMatched) {
       return;
