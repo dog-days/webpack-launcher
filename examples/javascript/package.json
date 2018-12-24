@@ -1,9 +1,9 @@
 {
-  "version": "0.0.2",
+  "version": "0.0.3",
   "name": "javascript-example",
   "private": true,
   "dependencies": {
-    "webpack-launcher": "^0.0.2"
+    "webpack-launcher": "^0.0.3"
   },
   "scripts": {
     "start": "webpack-launcher start",
