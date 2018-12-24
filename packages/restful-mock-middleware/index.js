@@ -49,8 +49,8 @@ function createMockMiddleware(options = {}) {
   return function(req, res, next) {
     // 只有 mockConfig 配置文件存在才处理
     if (fs.existsSync(mockConfigFile)) {
-      // 会在创建 ./mock/uploads 文件夹
-      // 所有只有 mock 的时候触发
+      // 会创建 ./mock/uploads 文件夹
+      // 所以只有 mock 的时候触发
       const uploadBodyParser = multer({ dest: uploadDest });
       // 多个 middleware 一起处理
       composeMiddlewares([
