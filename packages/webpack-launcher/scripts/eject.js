@@ -37,8 +37,6 @@ inquirer
       './scripts/start.js',
       './scripts/build.js',
       './scripts/serve-build.js',
-      './public/index.html',
-      './public/favicon.ico',
     ];
     shouldCopyedfileRelativePaths.forEach(relativeFilePath => {
       // 检查文件是否存储，只要其中存在立即中断 eject
@@ -47,7 +45,9 @@ inquirer
         console.log();
         console.log(chalk.red(`The ejected file ${relativeFilePath} exited! Eject aborted.`));
         console.log();
-        console.log(chalk.cyan('Make sure that the file not existed in any of the following:'));
+        console.log(
+          chalk.cyan('Make sure that the file not existed in any of the following files:')
+        );
         console.log();
         shouldCopyedfileRelativePaths.forEach(relativeFilePath => {
           console.log(`  ${relativeFilePath}`);
@@ -58,10 +58,6 @@ inquirer
     console.log();
     console.log('Ejecting...');
     console.log();
-
-    const copyedPublicFolder = path.resolve('public');
-    fs.ensureDirSync(copyedPublicFolder);
-    fs.copySync(path.resolve(__dirname, '../template/public'), copyedPublicFolder);
 
     shouldCopyedfileRelativePaths.forEach(relativeFilePath => {
       if (!!~relativeFilePath.indexOf('./public/')) {
