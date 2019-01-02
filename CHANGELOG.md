@@ -1,3 +1,17 @@
+## 0.0.4(2018-01-01)
+
+### Bug Fix
+
+- Fix decorators not work problem, use the legacy stage 1
+
+### Update
+
+无
+
+### New Function
+
+无
+
 ## 0.0.3(2018-12-24)
 
 ### Bug Fix
