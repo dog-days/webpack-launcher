@@ -36,8 +36,8 @@ module.exports = {
     //   displayName = 'test';
     // }
     '@babel/plugin-proposal-class-properties',
-    // 需要配套安装 @babel/runtime
-    // 其中 helper 功能可以减少转换生成的代码（通过引用 @bable/runtime）
+    // 需要配套安装 @babel/runtime（dependencies，非 devDependencies）
+    // 其中 helper 功能可以减少转换生成的代码（通过引用 @babel/runtime）
     '@babel/plugin-transform-runtime',
   ],
 };
