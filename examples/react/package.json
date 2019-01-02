@@ -1,10 +1,10 @@
 {
-  "version": "0.0.3",
+  "version": "0.0.4",
   "name": "react-example",
   "private": true,
   "dependencies": {
     "@babel/preset-react": "7.0.0",
-    "webpack-launcher": "^0.0.3"
+    "webpack-launcher": "^0.0.4"
   },
   "scripts": {
     "start": "webpack-launcher start",
