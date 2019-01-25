@@ -50,7 +50,7 @@ const publicPath = isEnvProduction ? `${webpackLauncherConfig.servedPath}` : '/'
 const shouldUseRelativeAssetPaths = publicPath === './';
 const PUBLIC_URL = isEnvProduction ? publicPath.slice(0, -1) : '';
 // common function to get style loaders
-const getStyleLoaders = (cssOptions, preProcessor) => {
+const getStyleLoaders = (cssOptions, preProcessor, preProcessorOptions) => {
   const loaders = [
     !isEnvProduction && require.resolve('style-loader'),
     isEnvProduction && {
@@ -99,6 +99,7 @@ const getStyleLoaders = (cssOptions, preProcessor) => {
         loader: requiredPreProcessor,
         options: {
           sourceMap: isEnvProduction && shouldUseSourceMap,
+          ...preProcessorOptions,
         },
       });
     }
@@ -383,7 +384,10 @@ const config = {
                 importLoaders: 2,
                 sourceMap: isEnvProduction && shouldUseSourceMap,
               },
-              'less-loader'
+              'less-loader',
+              {
+                javascriptEnabled: true,
+              }
             ),
             // Don't consider CSS imports dead code even if the
             // containing package claims to have no side effects.
