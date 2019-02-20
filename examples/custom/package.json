@@ -1,12 +1,12 @@
 {
-  "version": "0.0.4",
+  "version": "0.1.0",
   "name": "custom-example",
   "private": true,
   "dependencies": {
     "@babel/preset-react": "7.0.0",
     "less": "3.9.0",
     "less-loader": "4.1.0",
-    "webpack-launcher": "^0.0.4"
+    "webpack-launcher": "^0.1.0"
   },
   "scripts": {
     "start": "webpack-launcher start",
