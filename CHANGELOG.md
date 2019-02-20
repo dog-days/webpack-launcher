@@ -1,4 +1,18 @@
-## 0.0.4(2018-01-01)
+## 0.1.0(2019-02-20)
+
+### Bug Fix
+
+nothing
+
+### Update
+
+无
+
+### New Function
+
+- add javascriptEnabled true as the default option
+
+## 0.0.4(2019-01-01)
 
 ### Bug Fix
 
