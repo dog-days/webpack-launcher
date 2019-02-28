@@ -136,12 +136,11 @@ function runServer(options) {
   } else {
     app.use(compression());
   }
+  // 由于 body-parser 会截取 body 内容，所以 http-proxy-middleware 必须在 body-parser（ restful-mock-middleware 用到） 之前
+  // 可以看这个 issue https://github.com/chimurai/http-proxy-middleware/issues/40
+  app.use(createProxyMiddleware(proxy, server));
   // 需要用在 historyApiFallback 之前
-  // 默认优先级高于 proxy
   app.use(createMockMiddleware());
-  if (proxy) {
-    app.use(createProxyMiddleware(proxy, server));
-  }
   // single page
   // 需要用在 express.static 前面
   app.use(historyApiFallback());

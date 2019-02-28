@@ -55,8 +55,9 @@ module.exports = {
    * 在服务内部的所有其他中间件之前， 提供执行自定义中间件的功能。
    */
   before(app, server) {
-    // mock 优先级更高
-    app.use(createMockMiddleware());
+    // 由于 body-parser 会截取 body 内容，所以 http-proxy-middleware 必须在 body-parser（ restful-mock-middleware 用到） 之前
+    // 具体原因可以看这个 issue https://github.com/chimurai/http-proxy-middleware/issues/40
     app.use(createProxyMiddleware(proxy, server));
+    app.use(createMockMiddleware());
   },
 };
