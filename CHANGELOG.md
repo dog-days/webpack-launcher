@@ -1,3 +1,18 @@
+## 0.1.1(2019-02-20)
+
+### Bug Fix
+
+- fix the no reponse of post request in the proxy request
+- fix the proxy different place with webpack proxy
+
+### Update
+
+nothing
+
+### New Function
+
+- add the useMockServer webpack launcher setting
+
 ## 0.1.0(2019-02-20)
 
 ### Bug Fix
@@ -6,7 +21,7 @@ nothing
 
 ### Update
 
-无
+nothing
 
 ### New Function
 
@@ -20,11 +35,11 @@ nothing
 
 ### Update
 
-无
+nothing
 
 ### New Function
 
-无
+nothing
 
 ## 0.0.3(2018-12-24)
 
@@ -39,4 +54,4 @@ nothing
 
 ### New Function
 
-无
+nothing
