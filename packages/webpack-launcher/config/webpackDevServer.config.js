@@ -6,7 +6,7 @@ const createProxyMiddleware = require('webpack-dev-server-proxy-middlware');
 
 const webpackConfig = require('./webpack.config');
 const webpackLauncherConfig = require('../config/webpackLauncher.config');
-const { host, proxy, https, appPublic } = webpackLauncherConfig;
+const { host, proxy, https, appPublic, useMockServer } = webpackLauncherConfig;
 
 module.exports = {
   // 当使用 HTML5 History API 时，任意的 404 响应都可能需要被替代为 index.html。通过传入以下启用：
@@ -58,6 +58,8 @@ module.exports = {
     // 由于 body-parser 会截取 body 内容，所以 http-proxy-middleware 必须在 body-parser（ restful-mock-middleware 用到） 之前
     // 具体原因可以看这个 issue https://github.com/chimurai/http-proxy-middleware/issues/40
     app.use(createProxyMiddleware(proxy, server));
-    app.use(createMockMiddleware());
+    if (useMockServer) {
+      app.use(createMockMiddleware());
+    }
   },
 };

@@ -17,6 +17,9 @@ module.exports = {
   port: 8888,
   // https://webpack.docschina.org/configuration/dev-server/#devserver-proxy
   proxy: {},
+  // 默认使用使用 mock 服务
+  // 不需要可以关闭 mock 服务
+  useMockServer: true,
   https: false,
   // 设置 webpack alias
   // https://webpack.docschina.org/configuration/resolve/#resolve-alias
