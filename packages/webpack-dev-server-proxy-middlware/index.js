@@ -74,15 +74,17 @@ function createProxyMiddleware(proxy, server) {
      * ]
      */
     const proxyMiddlewares = proxy.map(proxyConfigOrCallback => {
-      return function sigaleProxyMiddleware(req, res, next) {
-        let proxyConfig;
-        let proxyMiddleware;
-        if (typeof proxyConfigOrCallback === 'function') {
-          proxyConfig = proxyConfigOrCallback();
-        } else {
-          proxyConfig = proxyConfigOrCallback;
-        }
+      let proxyConfig;
+      let proxyMiddleware;
+      if (typeof proxyConfigOrCallback === 'function') {
+        proxyConfig = proxyConfigOrCallback();
+      } else {
+        proxyConfig = proxyConfigOrCallback;
+      }
 
+      proxyMiddleware = getHttpProxyMiddleware(proxyConfig);
+
+      return function singleProxyMiddleware(req, res, next) {
         if (proxyConfig.ws) {
           websocketProxies.push(proxyMiddleware);
         }
