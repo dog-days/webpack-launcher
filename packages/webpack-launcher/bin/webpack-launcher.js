@@ -12,6 +12,7 @@ commander
   .command('eject', 'Eject config and script files to the project.')
   .command('start', 'Start the dev server.')
   .command('build', 'Production building.')
+  .command('build-dll', 'Dll building.')
   .command(
     'serve-build',
     'Serve the static files in the build folder with mock or proxy if exiting.'

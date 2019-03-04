@@ -6,7 +6,7 @@ const createProxyMiddleware = require('webpack-dev-server-proxy-middlware');
 
 const webpackConfig = require('./webpack.config');
 const webpackLauncherConfig = require('../config/webpackLauncher.config');
-const { host, proxy, https, appPublic, useMockServer } = webpackLauncherConfig;
+const { host, proxy, https, appPublic, useMockServer, buildGzip } = webpackLauncherConfig;
 
 module.exports = {
   // 当使用 HTML5 History API 时，任意的 404 响应都可能需要被替代为 index.html。通过传入以下启用：
@@ -55,6 +55,16 @@ module.exports = {
    * 在服务内部的所有其他中间件之前， 提供执行自定义中间件的功能。
    */
   before(app, server) {
+    if (buildGzip) {
+      app.use(function(req, res, next) {
+        if (/\.(js|css)$/.test(req.url) && !!~req.url.indexOf('dll/dll.')) {
+          // buildGzip 对 dll 也有效
+          res.header('Content-Encoding', 'gzip');
+        }
+        next();
+      });
+    }
+
     // 由于 body-parser 会截取 body 内容，所以 http-proxy-middleware 必须在 body-parser（ restful-mock-middleware 用到） 之前
     // 具体原因可以看这个 issue https://github.com/chimurai/http-proxy-middleware/issues/40
     app.use(createProxyMiddleware(proxy, server));

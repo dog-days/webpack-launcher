@@ -37,4 +37,6 @@ module.exports = {
   // 打包的 js、css 文件 gzip（后缀名还是 js 或者 css，但是内容已经 gzip）
   buildGzip: false,
   tar: undefined,
+  dllEntry: undefined,
+  appDllBuild: './public/dll',
 };

@@ -50,9 +50,21 @@ function checkConfig(config) {
   checkBoolean('sourceMap');
   checkBoolean('https');
   checkBoolean('buildGzip');
+
+  if (config.dllEntry !== undefined) {
+    checkPlainObject('dllEntry');
+    for (const key in config.dllEntry) {
+      if (!Array.isArray(config.dllEntry[key])) {
+        throw new TypeError('Expected the dllEntry[key] to be an array.');
+      }
+    }
+  }
+
   if (config.tar !== undefined) {
     checkString('tar');
   }
+
+  checkString('appDllBuild');
 
   const webpackHotDevClients = Object.values(webpackHotDevClientsObj);
   if (!~webpackHotDevClients.indexOf(webpackHotDevClient)) {
@@ -74,6 +86,7 @@ checkConfig(lastConfig);
 lastConfig.appSrc = path.resolve(lastConfig.appSrc);
 lastConfig.appIndexJs = path.resolve(lastConfig.appIndexJs);
 lastConfig.appBuild = path.resolve(lastConfig.appBuild);
+lastConfig.appDllBuild = path.resolve(lastConfig.appDllBuild);
 lastConfig.appPublic = path.resolve(lastConfig.appPublic);
 lastConfig.appHtml = path.resolve(lastConfig.appHtml);
 

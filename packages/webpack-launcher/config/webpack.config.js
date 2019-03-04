@@ -19,6 +19,7 @@ const SimpleProgressPlugin = require('webpack-simple-progress-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { webpackHotDevClientsObj } = require('webpack-launcher-utils/webpackLauncherConfig/const');
 const createVersionEntry = require('webpack-launcher-utils/createVersionEntry');
+const { createDllScripts } = require('webpack-launcher-utils/dllEntryUtils');
 
 const webpackLauncherConfig = require('../config/webpackLauncher.config');
 
@@ -483,7 +484,10 @@ const config = {
     // In production, it will be an empty string unless you specify "homepage"
     // in `package.json`, in which case it will be the pathname of that URL.
     // In development, this will be an empty string.
-    new InterpolateHtmlPlugin(HtmlWebpackPlugin, { PUBLIC_URL }),
+    new InterpolateHtmlPlugin(HtmlWebpackPlugin, {
+      PUBLIC_URL,
+      ADDITIONALSCRIPTS: createDllScripts(webpackLauncherConfig),
+    }),
     // 定义全局变量 process.env.servedPath，可用于 react-router 中的 basename
     // 定义全局变量 process.env.NODE_ENV，可用于生产和开发环境的判断
     new webpack.DefinePlugin(
@@ -537,6 +541,7 @@ const config = {
         clear: true,
       },
     }),
+
     // 需要过滤掉无效的配置
   ].filter(Boolean),
   // Some libraries import Node modules but don't use them in the browser.
@@ -549,4 +554,20 @@ const config = {
     child_process: 'empty',
   },
 };
+
+// 处理 dllEntry 配置
+if (webpackLauncherConfig.dllEntry) {
+  for (const dllEntryName in webpackLauncherConfig.dllEntry) {
+    config.plugins.push(
+      new webpack.DllReferencePlugin({
+        manifest: require(path.resolve(
+          webpackLauncherConfig.appDllBuild,
+          `${dllEntryName}-manifest.json`
+        )),
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.json', '.web.js', '.web.jsx'],
+      })
+    );
+  }
+}
+
 module.exports = config;
