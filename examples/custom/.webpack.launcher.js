@@ -5,7 +5,7 @@ module.exports = {
   sourceMap: false,
   tar: '{name}-v{version}.tar.gz',
   buildGzip: true,
-  host: 'webpack.launcher.com',
+  // host: 'webpack.launcher.com',
   proxy: {
     '/cigweb/v1/': 'http://cig.whtest.topvdn.com:57165/',
     '/v3/assistant/': {
@@ -20,5 +20,9 @@ module.exports = {
   },
   alias: {
     src: path.resolve('./src'),
+  },
+  dllEntry: {
+    main: ['react'],
+    other: ['react-dom'],
   },
 };

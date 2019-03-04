@@ -3,6 +3,8 @@
   "name": "custom-example",
   "private": true,
   "dependencies": {
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
     "@babel/preset-react": "7.0.0",
     "less": "3.9.0",
     "less-loader": "4.1.0",
@@ -11,6 +13,7 @@
   "scripts": {
     "start": "webpack-launcher start",
     "build": "webpack-launcher build",
+    "build-dll": "webpack-launcher build-dll",
     "serve-build": "webpack-launcher serve-build"
   }
 }
