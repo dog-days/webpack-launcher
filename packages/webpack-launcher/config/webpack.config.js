@@ -241,17 +241,10 @@ const config = {
     // Automatically split vendor and commons
     // https://twitter.com/wSokra/status/969633336732905474
     // https://medium.com/webpack/webpack-4-code-splitting-chunk-graph-and-the-splitchunks-optimization-be739a861366
-    splitChunks: {
-      // This indicates which chunks will be selected for optimization.
-      // If a string is provided, possible values are all, async, and initial.
-      // Providing all can be particularly powerful because it means that
-      // chunks can be shared even between async and non-async chunks.
-      chunks: 'all',
-      name: false,
-    },
+    splitChunks: webpackLauncherConfig.splitChunks,
     // Keep the runtime chunk seperated to enable long term caching
     // https://twitter.com/wSokra/status/969679223278505985
-    runtimeChunk: true,
+    runtimeChunk: webpackLauncherConfig.runtimeChunk,
   },
   module: {
     // makes missing exports an error instead of warning

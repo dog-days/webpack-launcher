@@ -59,6 +59,12 @@ function checkConfig(config) {
 
   checkString('appDllBuild');
 
+  if (config.splitChunks !== undefined) {
+    checkPlainObject('splitChunks');
+  }
+
+  checkBoolean('runtimeChunk');
+
   const webpackHotDevClients = Object.values(webpackHotDevClientsObj);
   if (!~webpackHotDevClients.indexOf(webpackHotDevClient)) {
     throw new Error(

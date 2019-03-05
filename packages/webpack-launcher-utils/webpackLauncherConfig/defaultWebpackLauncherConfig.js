@@ -39,4 +39,18 @@ module.exports = {
   tar: undefined,
   dllEntry: undefined,
   appDllBuild: './public/dll',
+  // Automatically split vendor and commons
+  // https://twitter.com/wSokra/status/969633336732905474
+  // https://medium.com/webpack/webpack-4-code-splitting-chunk-graph-and-the-splitchunks-optimization-be739a861366
+  // webpack 配置 optimization.splitChunks
+  // create-react-app 的默认值为：
+  // {
+  //   chunks: 'all',
+  //   name: false,
+  // },
+  splitChunks: undefined,
+  // Keep the runtime chunk seperated to enable long term caching
+  // https://twitter.com/wSokra/status/969679223278505985
+  // webpack 配置 optimization.runtimeChunk
+  runtimeChunk: false,
 };
