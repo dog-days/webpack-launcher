@@ -209,6 +209,19 @@ function build(previousFileSizes) {
 function copyPublicFolder() {
   fs.copySync(webpackLauncherConfig.appPublic, webpackLauncherConfig.appBuild, {
     dereference: true,
-    filter: file => file !== webpackLauncherConfig.appHtml,
+    filter: file => {
+      if (/.*-manifest\.json$/.test(file) && !!~file.indexOf(webpackLauncherConfig.appDllBuild)) {
+        return false;
+      }
+
+      if (/.*dll-entry-pacakge-verson-info\.json$/.test(file)) {
+        return false;
+      }
+
+      if (file === webpackLauncherConfig.appHtml) {
+        return false;
+      }
+      return true;
+    },
   });
 }
