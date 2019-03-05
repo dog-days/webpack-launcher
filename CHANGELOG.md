@@ -1,3 +1,19 @@
+## 0.4.0(2019-03-05)
+
+### Bug Fix
+
+- Resolve the case where the build command also executes the dll without the dll configuration
+
+### Update
+
+nothing
+
+### New Function
+
+- change the package version source for dll building
+- update eject.js with webpack.dll.config.js ejected
+- add webpack launcher config splitChunks and runtimeChunk
+
 ## 0.3.0(2019-03-05)
 
 ### Bug Fix
