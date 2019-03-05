@@ -34,6 +34,7 @@ inquirer
       './config/webpack.config.js',
       './config/webpackDevServer.config.js',
       './config/webpackLauncher.config.js',
+      './config/webpack.dll.config.js',
       './scripts/start.js',
       './scripts/build.js',
       './scripts/serve-build.js',
@@ -94,7 +95,8 @@ function updateCwdPackageJson() {
   const cwdPacakgeJson = require(cwdPacakgeJsonPath);
   cwdPacakgeJson.scripts.start = 'node ./scripts/start.js';
   cwdPacakgeJson.scripts.build = 'node ./scripts/build.js';
-  cwdPacakgeJson.scripts['serve-build'] = 'node ./scripts/serve-build.js';
+  cwdPacakgeJson.scripts['build-dll'] = 'node ./scripts/buildDll.js';
+  cwdPacakgeJson.scripts['serve-build'] = 'node ./scripts/serveBuild.js';
   delete cwdPacakgeJson.scripts.eject;
   fs.outputFileSync(cwdPacakgeJsonPath, JSON.stringify(cwdPacakgeJson, null, 2));
 }
