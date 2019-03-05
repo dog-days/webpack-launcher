@@ -1,3 +1,20 @@
+## 0.2.0(2019-03-05)
+
+### Bug Fix
+
+nothing
+
+### Update
+
+nothing
+
+### New Function
+
+- change the public folder copied way while building  
+  the dll directory in the public directory does not need to copy the json file such as the manifest.(build a web app)
+- add webpack dll custom feature
+- add webpackLauncherConfig proxy 和 useMockServer dynamic loading feature
+
 ## 0.1.1(2019-02-20)
 
 ### Bug Fix
