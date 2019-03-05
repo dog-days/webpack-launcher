@@ -5,6 +5,10 @@ const getVersionByPackageName = require('./getVersionByPackageName');
 
 const utils = {
   shouldBuildDll(dllEntry, appDllBuild) {
+    if (utils.shouldNotBuildDllWithNoPacakge(dllEntry)) {
+      return false;
+    }
+
     const prevPackageVersionInfoPath = path.resolve(appDllBuild, utils.savedPackageVersionFileName);
 
     if (!fs.existsSync(prevPackageVersionInfoPath)) {
@@ -21,10 +25,7 @@ const utils = {
 
     // package 版本文件不一致 或者 dll 文件被被删除 或者 dll manifest 文件被删除，
     // 同时 dllEntry 必须有配置，才需要 build dll。
-    return (
-      (shouldBuildDll || !isDllFileIsExists || !isDllManifestIsExists) &&
-      !utils.shouldNotBuildDllWithNoPacakge(dllEntry)
-    );
+    return shouldBuildDll || !isDllFileIsExists || !isDllManifestIsExists;
   },
   /**
    * 当无 dllEntry pacakge 时不应该构建 dll
