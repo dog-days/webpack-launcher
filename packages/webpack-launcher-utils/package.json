@@ -1,6 +1,6 @@
 {
   "name": "webpack-launcher-utils",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "homepage": "https://github.com/dog-days/webpack-launcher",
   "repository": "https://github.com/dog-days/webpack-launcher",
   "bugs": "https://github.com/dog-days/webpack-launcher/issues",
