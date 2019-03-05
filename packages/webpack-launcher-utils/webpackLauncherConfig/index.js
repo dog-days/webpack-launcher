@@ -4,6 +4,7 @@ const fs = require('fs');
 const _ = require('lodash');
 
 const { webpackHotDevClientsObj } = require('./const');
+
 const defaultConfig = require('./defaultWebpackLauncherConfig');
 
 function checkConfig(config) {
@@ -11,29 +12,21 @@ function checkConfig(config) {
   function checkString(checkTarget) {
     if (!_.isString(config[checkTarget])) {
       throw new TypeError(`Expected the ${checkTarget} to be a string.`);
-      // eslint-disable-next-line
-      process.exit(1);
     }
   }
   function checkNumber(checkTarget) {
     if (!_.isNumber(config[checkTarget])) {
       throw new TypeError(`Expected the ${checkTarget} to be a number.`);
-      // eslint-disable-next-line
-      process.exit(1);
     }
   }
   function checkPlainObject(checkTarget) {
     if (!_.isPlainObject(config[checkTarget])) {
       throw new TypeError(`Expected the ${checkTarget} to be a plain object.`);
-      // eslint-disable-next-line
-      process.exit(1);
     }
   }
   function checkBoolean(checkTarget) {
     if (!_.isBoolean(config[checkTarget])) {
       throw new TypeError(`Expected the ${checkTarget} to be a boolean.`);
-      // eslint-disable-next-line
-      process.exit(1);
     }
   }
   checkString('servedPath');
@@ -77,6 +70,8 @@ function checkConfig(config) {
 const customConfigAbsolutePath = path.resolve('.webpack.launcher.js');
 let customConfig = {};
 if (fs.existsSync(customConfigAbsolutePath)) {
+  // 可动态修改 proxy 配置等
+  delete require.cache[customConfigAbsolutePath];
   customConfig = require(customConfigAbsolutePath);
 }
 const lastConfig = Object.assign({}, defaultConfig, customConfig);

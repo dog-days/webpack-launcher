@@ -120,16 +120,7 @@ function createServer(app, options = {}) {
 }
 
 function runServer(options) {
-  let {
-    host,
-    port,
-    proxy,
-    appBuild,
-    https: isHttps,
-    servedPath,
-    buildGzip,
-    useMockServer,
-  } = options;
+  let { host, port, appBuild, https: isHttps, servedPath, buildGzip } = options;
   const app = express();
   // 为了在 createMockMiddleware 中使用
   const server = createServer(app, { https: isHttps });
@@ -147,11 +138,19 @@ function runServer(options) {
   }
   // 由于 body-parser 会截取 body 内容，所以 http-proxy-middleware 必须在 body-parser（ restful-mock-middleware 用到） 之前
   // 可以看这个 issue https://github.com/chimurai/http-proxy-middleware/issues/40
-  app.use(createProxyMiddleware(proxy, server));
-  if (useMockServer) {
-    // 需要用在 historyApiFallback 之前
-    app.use(createMockMiddleware());
-  }
+  app.use(function(...args) {
+    // 可动态修改 proxy 配置
+    delete require.cache[require.resolve('webpack-launcher-utils/webpackLauncherConfig')];
+    const { proxy, useMockServer } = require('webpack-launcher-utils/webpackLauncherConfig');
+
+    createProxyMiddleware(proxy, server)(...args);
+
+    if (useMockServer) {
+      // 需要用在 historyApiFallback 之前
+      app.use(createMockMiddleware());
+    }
+  });
+
   // single page
   // 需要用在 express.static 前面
   app.use(historyApiFallback());
