@@ -31,6 +31,7 @@ const createSigntSigtermProcessEvent = require('webpack-launcher-utils/createSig
 const historyApiFallback = require('connect-history-api-fallback');
 const openBrowser = require('react-dev-utils/openBrowser');
 const { choosePort } = require('react-dev-utils/WebpackDevServerUtils');
+const composeMiddlewares = require('webpack-launcher-utils/expressMiddlewareCompose');
 const createMockMiddleware = require('restful-mock-middleware');
 const createProxyMiddleware = require('webpack-dev-server-proxy-middlware');
 const webpackLauncherConfig = require('webpack-launcher-utils/webpackLauncherConfig');
@@ -142,13 +143,15 @@ function runServer(options) {
     // 可动态修改 proxy 配置
     delete require.cache[require.resolve('webpack-launcher-utils/webpackLauncherConfig')];
     const { proxy, useMockServer } = require('webpack-launcher-utils/webpackLauncherConfig');
+    const middlewares = [];
 
-    createProxyMiddleware(proxy, server)(...args);
+    middlewares.push(createProxyMiddleware(proxy, server));
 
     if (useMockServer) {
-      // 需要用在 historyApiFallback 之前
-      app.use(createMockMiddleware());
+      middlewares.push(createMockMiddleware());
     }
+
+    composeMiddlewares(middlewares)(...args);
   });
 
   // single page

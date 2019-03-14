@@ -3,6 +3,7 @@
 
 const createMockMiddleware = require('restful-mock-middleware');
 const createProxyMiddleware = require('webpack-dev-server-proxy-middlware');
+const composeMiddlewares = require('webpack-launcher-utils/expressMiddlewareCompose');
 
 const webpackConfig = require('./webpack.config');
 const webpackLauncherConfig = require('../config/webpackLauncher.config');
@@ -71,12 +72,15 @@ module.exports = {
       // 可动态修改 proxy 配置
       delete require.cache[require.resolve('webpack-launcher-utils/webpackLauncherConfig')];
       const { proxy, useMockServer } = require('webpack-launcher-utils/webpackLauncherConfig');
+      const middlewares = [];
 
-      createProxyMiddleware(proxy, server)(...args);
+      middlewares.push(createProxyMiddleware(proxy, server));
 
       if (useMockServer) {
-        app.use(createMockMiddleware());
+        middlewares.push(createMockMiddleware());
       }
+
+      composeMiddlewares(middlewares)(...args);
     });
   },
 };
