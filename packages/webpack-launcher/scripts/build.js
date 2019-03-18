@@ -218,6 +218,10 @@ function copyPublicFolder() {
         return false;
       }
 
+      if (/.gitignore$/.test(file)) {
+        return false;
+      }
+
       if (file === webpackLauncherConfig.appHtml) {
         return false;
       }
