@@ -1,3 +1,17 @@
+## 0.5.0(2019-03-18)
+
+### Bug Fix
+
+nothing
+
+### Update
+
+nothing
+
+### New Function
+
+- building will not copy the .gitignore file
+
 ## 0.4.0(2019-03-05)
 
 ### Bug Fix
