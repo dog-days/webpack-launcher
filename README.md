@@ -23,7 +23,7 @@ npm start
 
 **注意**：
 
- `npm run init-webpack-launcher`（postinstall 会添加添加此命令，直接使用即可）。此命令的内容为：`webpack-launcher init`，运行此命令后可在终端看到如下信息：
+`npm run init-webpack-launcher`（postinstall 会添加添加此命令，直接使用即可）。此命令的内容为：`webpack-launcher init`，运行此命令后可在终端看到如下信息：
 
 ```sh
 Adding ./public folder.
@@ -65,11 +65,25 @@ module.exports = {
   presets: [
     // 支持 react jsx
     ['@babel/react'],
-  ]
+  ],
 };
 ```
 
 然后在 src/index.js 入口文件添加 React 代码即可，其他无改动。
+
+### 使用 Less
+
+安装 `npm i less less-loader` ，安装完后 `npm start` 启动即可，无需做任何其他配置。
+
+### 使用 Sass
+
+安装 `npm i node-sass sass-loader` ，安装完后 `npm start` 启动即可，无需做任何其他配置。
+
+注意：安装 node-sass 可能会出现各种错误，或者安装不了，即使你切换到淘宝镜像，也解决不了这种问题。本人通过在 `~/.npmrc` 添加如下代码，然后安装没出现什么问题，安装也挺快（ps：不过我已经不用 Sass，不知道现在什么情况）。
+
+```sh
+sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
+```
 
 ## webpack-launcher 配置文件
 
@@ -135,7 +149,6 @@ module.exports = {
   // webpack 配置 optimization.runtimeChunk
   runtimeChunk: false,
 };
-
 ```
 
 **功能列表会逐一说明，说有配置都是可选的。**
@@ -217,11 +230,11 @@ module.exports = {
     mockApp.get('/keeper/v1/topic', function(req, res) {
       res.send({ url: req.url, query: req.query });
     });
-    
+
     mockApp.post('/keeper/v1/topic', function(req, res) {
       res.send({ url: req.url, query: req.query });
     });
-    
+
     mockApp.patch('/keeper/v1/topic/:id', function(req, res) {
       res.send({
         url: req.url,
@@ -230,7 +243,7 @@ module.exports = {
         'data|10': [{ 'id|+1': 1 }],
       });
     });
-    
+
     mockApp.delete('/keeper/v1/topic/:id', function(req, res) {
       res.send({ url: req.url, query: req.query });
     });
@@ -262,7 +275,7 @@ module.exports = function(mockApp) {
 ```js
 module.exports = {
   useMockServer: false,
-}
+};
 ```
 
 ### proxy（反向代理）
@@ -276,19 +289,19 @@ module.exports = {
 ```js
 module.exports = {
   host: 'webpack.launcher.com',
-}
+};
 ```
 
 启动服务后，会自动更新 host 到系统 hosts 文件。
 
 ### 使用 Https
 
- 是否使用 https 协议启动服务，默认不开启，用法请看 [webpack-dev-server 文档](https://www.webpackjs.com/configuration/dev-server/#devserver-https)，这里`.webpack.launcher.js` 配置简化为：
+是否使用 https 协议启动服务，默认不开启，用法请看 [webpack-dev-server 文档](https://www.webpackjs.com/configuration/dev-server/#devserver-https)，这里`.webpack.launcher.js` 配置简化为：
 
 ```js
 module.exports = {
   https: true,
-}
+};
 ```
 
 ### 别名（alias）
@@ -306,7 +319,7 @@ module.exports = {
     // 为了减少打包体积，无需引入多余的 icon
     '@ant-design/icons/lib/dist$': path.resolve('./src/icons.js'),
   },
-}
+};
 ```
 
 ### 环境全局变量
@@ -316,11 +329,11 @@ module.exports = {
 ```js
 new webpack.DefinePlugin({
   PRODUCTION: JSON.stringify(true),
-  VERSION: JSON.stringify("5fa3b9"),
+  VERSION: JSON.stringify('5fa3b9'),
   BROWSER_SUPPORTS_HTML5: true,
-  TWO: "1+1",
-  "typeof window": JSON.stringify("object")
-})
+  TWO: '1+1',
+  'typeof window': JSON.stringify('object'),
+});
 ```
 
 这里 `.webpack.launcher.js` 配置 简化为：
@@ -329,12 +342,12 @@ new webpack.DefinePlugin({
 module.exports = {
   globals: {
     PRODUCTION: JSON.stringify(true),
-    VERSION: JSON.stringify("5fa3b9"),
+    VERSION: JSON.stringify('5fa3b9'),
     BROWSER_SUPPORTS_HTML5: true,
-    TWO: "1+1",
-    "typeof window": JSON.stringify("object")
+    TWO: '1+1',
+    'typeof window': JSON.stringify('object'),
   },
-}
+};
 ```
 
 ### js、css 内容 gzip
@@ -348,12 +361,12 @@ module.exports = {
 ```js
 module.exports = {
   buildGzip: true,
-}
+};
 ```
 
 ### 热替换
 
- 热替换有两种值选择：
+热替换有两种值选择：
 
 - default
 
@@ -363,7 +376,7 @@ module.exports = {
 
   craate-react-app 热替换方式（webpack-launcher 默认开启这个）
 
-###  DLL 功能
+### DLL 功能
 
 如果你使用 webpack 直接配置 dll，那么这将会比较繁杂，但是如果你使用 `webpack-launcher`，那边将会非常简单。
 
@@ -372,16 +385,10 @@ module.exports = {
 ```js
 module.exports = {
   dllEntry: {
-    main: [
-      'react',
-      'react-dom',
-    ],
-    other: [
-      'redux',
-      'react-redux',
-    ],
+    main: ['react', 'react-dom'],
+    other: ['redux', 'react-redux'],
   },
-}
+};
 ```
 
 **请确保 node_modules 下提取到 dll 的包已存在**，如果你使用的是 lerna 之类的多包管理工具（monorepo），不用担心，也没问题。
@@ -401,7 +408,7 @@ module.exports = {
 ```js
 module.exports = {
   tar: `{name}-frontend-v{version}.tar.gz`,
-}
+};
 ```
 
 其中 `{name}` 会替换为 package.json 的 name 字段，`{version}` 会替换为 package.json 的 `version` 字段。
@@ -411,3 +418,29 @@ module.exports = {
 为了方便验收构建后的 web app，webpack launcher 也提供了静态服务功能，同时 `.webpack.launcher.js` 的 配置页使用于静态服务（除开 webpack 开发环境相关的配置，如 alias 等）。
 
 `npm run build` 构建成功后，直接运行 `npm run serve-build` 即可（proxy 、mock 配置一样可用）。
+
+## eject
+
+如果你想要更好的自定义其他 webpack 功能，你需要用到 eject 功能（如果你用过 create-react-app eject 功能更），那么很好理解。
+
+`npm run eject` 后终端会输出如下信息：
+
+```sh
+? Are you sure you want to eject? This action is permanent. Yes
+
+Ejecting...
+
+  Adding ./.eslintrc.js
+  Adding ./.babelrc.js
+  Adding ./config/webpack.config.js
+  Adding ./config/webpackDevServer.config.js
+  Adding ./config/webpackLauncher.config.js
+  Adding ./config/webpack.dll.config.js
+  Adding ./scripts/start.js
+  Adding ./scripts/build.js
+  Adding ./scripts/serveBuild.js
+
+Ejected sucessfully!
+```
+
+然后你就可以为所欲为了。
