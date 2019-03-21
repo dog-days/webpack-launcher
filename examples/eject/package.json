@@ -1,11 +1,11 @@
 {
-  "version": "0.5.1",
+  "version": "0.5.2",
   "name": "eject-example",
   "private": true,
   "dependencies": {
     "restful-mock-middleware": "^0.5.0",
     "webpack-dev-server-proxy-middlware": "^0.5.0",
-    "webpack-launcher": "^0.5.1",
+    "webpack-launcher": "^0.5.2",
     "webpack-launcher-static": "^0.5.0",
     "webpack-launcher-utils": "^0.5.0"
   },
