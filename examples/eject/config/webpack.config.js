@@ -19,6 +19,7 @@ const SimpleProgressPlugin = require('webpack-simple-progress-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { webpackHotDevClientsObj } = require('webpack-launcher-utils/webpackLauncherConfig/const');
 const createVersionEntry = require('webpack-launcher-utils/createVersionEntry');
+const { createDllScripts } = require('webpack-launcher-utils/dllEntryUtils');
 
 const webpackLauncherConfig = require('../config/webpackLauncher.config');
 
@@ -50,7 +51,7 @@ const publicPath = isEnvProduction ? `${webpackLauncherConfig.servedPath}` : '/'
 const shouldUseRelativeAssetPaths = publicPath === './';
 const PUBLIC_URL = isEnvProduction ? publicPath.slice(0, -1) : '';
 // common function to get style loaders
-const getStyleLoaders = (cssOptions, preProcessor) => {
+const getStyleLoaders = (cssOptions, preProcessor, preProcessorOptions) => {
   const loaders = [
     !isEnvProduction && require.resolve('style-loader'),
     isEnvProduction && {
@@ -99,6 +100,7 @@ const getStyleLoaders = (cssOptions, preProcessor) => {
         loader: requiredPreProcessor,
         options: {
           sourceMap: isEnvProduction && shouldUseSourceMap,
+          ...preProcessorOptions,
         },
       });
     }
@@ -239,17 +241,10 @@ const config = {
     // Automatically split vendor and commons
     // https://twitter.com/wSokra/status/969633336732905474
     // https://medium.com/webpack/webpack-4-code-splitting-chunk-graph-and-the-splitchunks-optimization-be739a861366
-    splitChunks: {
-      // This indicates which chunks will be selected for optimization.
-      // If a string is provided, possible values are all, async, and initial.
-      // Providing all can be particularly powerful because it means that
-      // chunks can be shared even between async and non-async chunks.
-      chunks: 'all',
-      name: false,
-    },
+    splitChunks: webpackLauncherConfig.splitChunks,
     // Keep the runtime chunk seperated to enable long term caching
     // https://twitter.com/wSokra/status/969679223278505985
-    runtimeChunk: true,
+    runtimeChunk: webpackLauncherConfig.runtimeChunk,
   },
   module: {
     // makes missing exports an error instead of warning
@@ -375,7 +370,10 @@ const config = {
                 importLoaders: 2,
                 sourceMap: isEnvProduction && shouldUseSourceMap,
               },
-              'less-loader'
+              'less-loader',
+              {
+                javascriptEnabled: true,
+              }
             ),
             // Don't consider CSS imports dead code even if the
             // containing package claims to have no side effects.
@@ -471,7 +469,10 @@ const config = {
     // In production, it will be an empty string unless you specify "homepage"
     // in `package.json`, in which case it will be the pathname of that URL.
     // In development, this will be an empty string.
-    new InterpolateHtmlPlugin(HtmlWebpackPlugin, { PUBLIC_URL }),
+    new InterpolateHtmlPlugin(HtmlWebpackPlugin, {
+      PUBLIC_URL,
+      ADDITIONALSCRIPTS: createDllScripts(webpackLauncherConfig),
+    }),
     // 定义全局变量 process.env.servedPath，可用于 react-router 中的 basename
     // 定义全局变量 process.env.NODE_ENV，可用于生产和开发环境的判断
     new webpack.DefinePlugin(
@@ -525,6 +526,7 @@ const config = {
         clear: true,
       },
     }),
+
     // 需要过滤掉无效的配置
   ].filter(Boolean),
   // Some libraries import Node modules but don't use them in the browser.
@@ -537,4 +539,20 @@ const config = {
     child_process: 'empty',
   },
 };
+
+// 处理 dllEntry 配置
+if (webpackLauncherConfig.dllEntry) {
+  for (const dllEntryName in webpackLauncherConfig.dllEntry) {
+    config.plugins.push(
+      new webpack.DllReferencePlugin({
+        manifest: require(path.resolve(
+          webpackLauncherConfig.appDllBuild,
+          `${dllEntryName}-manifest.json`
+        )),
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.json', '.web.js', '.web.jsx'],
+      })
+    );
+  }
+}
+
 module.exports = config;

@@ -3,10 +3,11 @@
 
 const createMockMiddleware = require('restful-mock-middleware');
 const createProxyMiddleware = require('webpack-dev-server-proxy-middlware');
+const composeMiddlewares = require('webpack-launcher-utils/expressMiddlewareCompose');
 
 const webpackConfig = require('./webpack.config');
 const webpackLauncherConfig = require('../config/webpackLauncher.config');
-const { host, proxy, https, appPublic } = webpackLauncherConfig;
+const { host, https, appPublic, buildGzip } = webpackLauncherConfig;
 
 module.exports = {
   // 当使用 HTML5 History API 时，任意的 404 响应都可能需要被替代为 index.html。通过传入以下启用：
@@ -55,8 +56,31 @@ module.exports = {
    * 在服务内部的所有其他中间件之前， 提供执行自定义中间件的功能。
    */
   before(app, server) {
-    // mock 优先级更高
-    app.use(createMockMiddleware());
-    app.use(createProxyMiddleware(proxy, server));
+    if (buildGzip) {
+      app.use(function(req, res, next) {
+        if (/\.(js|css)$/.test(req.url) && !!~req.url.indexOf('dll/dll.')) {
+          // buildGzip 对 dll 也有效
+          res.header('Content-Encoding', 'gzip');
+        }
+        next();
+      });
+    }
+
+    // 由于 body-parser 会截取 body 内容，所以 http-proxy-middleware 必须在 body-parser（ restful-mock-middleware 用到） 之前
+    // 可以看这个 issue https://github.com/chimurai/http-proxy-middleware/issues/40
+    app.use(function(...args) {
+      // 可动态修改 proxy 配置
+      delete require.cache[require.resolve('webpack-launcher-utils/webpackLauncherConfig')];
+      const { proxy, useMockServer } = require('webpack-launcher-utils/webpackLauncherConfig');
+      const middlewares = [];
+
+      middlewares.push(createProxyMiddleware(proxy, server));
+
+      if (useMockServer) {
+        middlewares.push(createMockMiddleware());
+      }
+
+      composeMiddlewares(middlewares)(...args);
+    });
   },
 };

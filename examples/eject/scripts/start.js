@@ -4,7 +4,7 @@
 // 检测 node 版本
 require('webpack-launcher-utils/checkNodeVersion')();
 
-console.log('Starting service...');
+console.log('Starting the development server...');
 
 process.env.NODE_ENV = 'development';
 process.env.BABEL_ENV = 'development';
