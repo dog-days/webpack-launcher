@@ -1,3 +1,17 @@
+## 0.5.2(2019-03-21)
+
+### Bug Fix
+
+- fix the ejected files not containing the dll feature problem
+
+### Update
+
+nothing
+
+### New Function
+
+nothing
+
 ## 0.5.1(2019-03-21)
 
 ### Bug Fix
