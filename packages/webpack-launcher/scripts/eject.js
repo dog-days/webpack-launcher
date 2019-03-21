@@ -37,7 +37,7 @@ inquirer
       './config/webpack.dll.config.js',
       './scripts/start.js',
       './scripts/build.js',
-      './scripts/serve-build.js',
+      './scripts/serveBuild.js',
     ];
     shouldCopyedfileRelativePaths.forEach(relativeFilePath => {
       // 检查文件是否存储，只要其中存在立即中断 eject
