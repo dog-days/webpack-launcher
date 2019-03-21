@@ -1,3 +1,17 @@
+## 0.5.1(2019-03-21)
+
+### Bug Fix
+
+- fix the serve-build.js not exits error（npm run eject）
+
+### Update
+
+nothing
+
+### New Function
+
+nothing
+
 ## 0.5.0(2019-03-18)
 
 ### Bug Fix
