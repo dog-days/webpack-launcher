@@ -1,3 +1,17 @@
+## 0.5.3(2019-04-11)
+
+### Bug Fix
+
+- fix the servePath of webpack launcher config invalidation problem
+
+### Update
+
+nothing
+
+### New Function
+
+nothing
+
 ## 0.5.2(2019-03-21)
 
 ### Bug Fix
