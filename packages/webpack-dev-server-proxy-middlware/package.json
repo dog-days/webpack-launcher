@@ -1,6 +1,6 @@
 {
   "name": "webpack-dev-server-proxy-middlware",
-  "version": "0.5.0",
+  "version": "0.5.3",
   "homepage": "https://github.com/dog-days/webpack-launcher",
   "repository": "https://github.com/dog-days/webpack-launcher",
   "bugs": "https://github.com/dog-days/webpack-launcher/issues",
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "http-proxy-middleware": "^0.19.1",
-    "webpack-launcher-utils": "^0.5.0"
+    "webpack-launcher-utils": "^0.5.3"
   },
   "license": "ISC"
 }
