@@ -1,7 +1,8 @@
 'use strict';
 
 /**
- * 从左到右合并 express middleware，避免回调地狱
+ * 从左到右（数组）合并 express middleware，避免回调地狱
+ * 暂时不支持 express error middleware
  * middlewares 的执行顺序从左到右，这个跟 redux 的 compose 的顺序相反（因为 next 回调）
  * @param {Array} middlewares The express middlewares
  * @returns {Function} 返回一个组合的 express middleware
