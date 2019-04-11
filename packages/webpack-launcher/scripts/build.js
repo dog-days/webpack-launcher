@@ -39,12 +39,26 @@ const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
 // 这些文件非常大的话，我们会抛出警告。
 const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024;
 const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
+const {
+  appBuildRoot,
+  appBuild,
+  appDllBuild,
+  appHtml,
+  appIndexJs,
+  buildGzip,
+  tar: buildTar,
+  appPublic,
+} = webpackLauncherConfig;
 
 // 如果入口 js 文件和入口 html 文件不存在，退出并报错
-if (!checkRequiredFiles([webpackLauncherConfig.appHtml, webpackLauncherConfig.appIndexJs])) {
+if (!checkRequiredFiles([appHtml, appIndexJs])) {
   process.exit(1);
 }
 
+// 构建的 root 文件夹
+// appBuild 不一定是根目录，需要把 servedPath 移除
+// 根目录一定是 build 文件夹（默认值）
+const root = appBuildRoot;
 // Process CLI arguments
 // npm run build -- --stats 会存储 webpack stats json 信息
 // 到 ${webpackLauncherConfig.appBuild}/bundle-stats.json 中
@@ -53,10 +67,11 @@ const writeStatsJson = argv.indexOf('--stats') !== -1;
 
 // First, read the current file sizes in build directory.
 // This lets us display how much they changed later.
-measureFileSizesBeforeBuild(webpackLauncherConfig.appBuild)
+measureFileSizesBeforeBuild(appBuild)
   .then(previousFileSizes => {
     // 首先清空 build 文件夹
-    fs.emptyDirSync(webpackLauncherConfig.appBuild);
+    fs.emptyDirSync(appBuild);
+    fs.emptyDirSync(root);
     // 复制 public 相关静态文件到 build 文件
     copyPublicFolder();
     // 开始 webpack build 服务
@@ -83,29 +98,27 @@ measureFileSizesBeforeBuild(webpackLauncherConfig.appBuild)
       printFileSizesAfterBuild(
         stats,
         previousFileSizes,
-        webpackLauncherConfig.appBuild,
+        appBuild,
         WARN_AFTER_BUNDLE_GZIP_SIZE,
         WARN_AFTER_CHUNK_GZIP_SIZE
       );
-      if (webpackLauncherConfig.buildGzip) {
+      if (buildGzip) {
         console.log();
         // 如果开启打包文件 gzip 功能，打包后端 css 和 js 文件内容都是经过 gzip 后的内容
         // 需要 gzip 解压后才可以访问
         console.log('Creating the gzip files...');
-        gzipJsCssFiles(stats, webpackLauncherConfig.appBuild);
+        gzipJsCssFiles(stats, appBuild);
         console.log(chalk.green('Complete the gizp files creation.'));
       }
-      if (webpackLauncherConfig.tar) {
+      if (buildTar) {
         console.log();
         function getTarFileName() {
           const { name, version } = require(path.resolve('package.json'));
-          return webpackLauncherConfig.tar
-            .replace(/\{version\}/g, version)
-            .replace(/\{name\}/g, name);
+          return buildTar.replace(/\{version\}/g, version).replace(/\{name\}/g, name);
         }
         const fileName = getTarFileName();
         const filePath = path.resolve(fileName);
-        const shouldGzip = !!~webpackLauncherConfig.tar.match(/.*\.([^.]+)/)[1].indexOf('gz');
+        const shouldGzip = !!~buildTar.match(/.*\.([^.]+)/)[1].indexOf('gz');
 
         console.log(`Creating the ${fileName} file...`);
 
@@ -113,13 +126,14 @@ measureFileSizesBeforeBuild(webpackLauncherConfig.appBuild)
           // 先删除存在的 tar 文件
           fs.removeSync(filePath);
         }
+
         tar
           .c(
             {
               gzip: shouldGzip,
               file: filePath,
             },
-            [path.relative('./', webpackLauncherConfig.appBuild)]
+            [path.relative('./', appBuild)]
           )
           .then(_ => {
             console.log(chalk.green(`Complete the ${fileName} file creation.`));
@@ -196,7 +210,7 @@ function build(previousFileSizes) {
       };
       if (writeStatsJson) {
         return bfj
-          .write(webpackLauncherConfig.appBuild + '/bundle-stats.json', stats.toJson())
+          .write(appBuild + '/bundle-stats.json', stats.toJson())
           .then(() => resolve(resolveArgs))
           .catch(error => reject(new Error(error)));
       }
@@ -207,10 +221,10 @@ function build(previousFileSizes) {
 }
 
 function copyPublicFolder() {
-  fs.copySync(webpackLauncherConfig.appPublic, webpackLauncherConfig.appBuild, {
+  fs.copySync(appPublic, appBuild, {
     dereference: true,
     filter: file => {
-      if (/.*-manifest\.json$/.test(file) && !!~file.indexOf(webpackLauncherConfig.appDllBuild)) {
+      if (/.*-manifest\.json$/.test(file) && !!~file.indexOf(appDllBuild)) {
         return false;
       }
 
@@ -222,7 +236,7 @@ function copyPublicFolder() {
         return false;
       }
 
-      if (file === webpackLauncherConfig.appHtml) {
+      if (file === appHtml) {
         return false;
       }
       return true;

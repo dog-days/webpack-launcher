@@ -84,19 +84,26 @@ const lastConfig = Object.assign({}, defaultConfig, customConfig);
 
 checkConfig(lastConfig);
 
+if (lastConfig.servedPath !== '/') {
+  // 需要运行在 lastConfig.appBuild 重新赋值之前
+  // 保证为 /xxx/xx/ 格式
+  lastConfig.servedPath =
+    '/' +
+    lastConfig.servedPath
+      .split('/')
+      .filter(Boolean)
+      .join('/') +
+    '/';
+}
+
 lastConfig.appSrc = path.resolve(lastConfig.appSrc);
 lastConfig.appIndexJs = path.resolve(lastConfig.appIndexJs);
-lastConfig.appBuild = path.resolve(lastConfig.appBuild);
+// 构建的根目录，默认为项目根目录 ./build
+lastConfig.appBuildRoot = lastConfig.appBuild;
+// slice servedPath 不以 / 开头
+lastConfig.appBuild = path.resolve(lastConfig.appBuild, lastConfig.servedPath.slice(1));
 lastConfig.appDllBuild = path.resolve(lastConfig.appDllBuild);
 lastConfig.appPublic = path.resolve(lastConfig.appPublic);
 lastConfig.appHtml = path.resolve(lastConfig.appHtml);
-
-// 保证为 /xxx/xx/ 格式
-lastConfig.servedPath =
-  '/' +
-  lastConfig.servedPath
-    .split('/')
-    .filter(Boolean)
-    .join('/');
 
 module.exports = lastConfig;

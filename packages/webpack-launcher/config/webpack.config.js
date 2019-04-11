@@ -41,7 +41,7 @@ const lessModuleRegex = /\.module\.less$/;
 // 例如`/demo`，访问网站根目录demo文件中的web app
 // publicPath: 'https://cdn.example.com/assets/', // CDN（总是 HTTPS 协议）
 // publicPath: '//cdn.example.com/assets/', // CDN（协议相同）
-// publicPath: '/assets/', // 相对于服务(server-relative)
+// publicPath: '/assets/', // 相对于 web 服务根目录(server-relative)
 // publicPath: 'assets/', // 相对于 HTML 页面
 // publicPath: '../assets/', // 相对于 HTML 页面
 // publicPath: '', // 相对于 HTML 页面（目录相同）
@@ -49,6 +49,8 @@ const publicPath = isEnvProduction ? `${webpackLauncherConfig.servedPath}` : '/'
 // Some apps do not use client-side routing with pushState.
 // For these, "homepage" can be set to "." to enable relative asset paths.
 const shouldUseRelativeAssetPaths = publicPath === './';
+// PUBLIC_URL 比 publicPath 少最右边一个 ’/‘
+// 如 /test/ => /test
 const PUBLIC_URL = isEnvProduction ? publicPath.slice(0, -1) : '';
 // common function to get style loaders
 const getStyleLoaders = (cssOptions, preProcessor, preProcessorOptions) => {

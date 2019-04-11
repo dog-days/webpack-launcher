@@ -121,11 +121,14 @@ function createServer(app, options = {}) {
 }
 
 function runServer(options) {
-  let { host, port, appBuild, https: isHttps, servedPath, buildGzip } = options;
+  let { host, port, appBuildRoot, https: isHttps, servedPath, buildGzip } = options;
   const app = express();
   // 为了在 createMockMiddleware 中使用
   const server = createServer(app, { https: isHttps });
-  const root = path.resolve(appBuild);
+  //  appBuild 不一定是根目录，需要把 servedPath 移除
+  // 根目录一定是 build 文件夹（默认值）
+  const root = appBuildRoot;
+
   if (buildGzip) {
     // build js css 文件已经 gizp，只需要设置响应头
     app.use(function(req, res, next) {
@@ -156,7 +159,11 @@ function runServer(options) {
 
   // single page
   // 需要用在 express.static 前面
-  app.use(historyApiFallback());
+  app.use(
+    historyApiFallback({
+      index: `${servedPath}index.html`,
+    })
+  );
   app.use(express.static(root));
 
   server.listen(port, function() {
