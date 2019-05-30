@@ -157,11 +157,13 @@ const utils = {
     const dllFilesName = utils.getAllDllFilesName(dllEntry, appDllBuild);
 
     dllFilesName.forEach(fileName => {
-      const scriptUrl = path.resolve(
-        process.env.NODE_ENV === 'production' ? servedPath : '/',
-        appDllBuild.replace(appPublic, '').slice(1),
-        fileName
-      );
+      const scriptUrl = path
+        .join(
+          process.env.NODE_ENV === 'production' ? servedPath : '/',
+          appDllBuild.replace(appPublic, '').slice(1),
+          fileName
+        )
+        .replace(/\\/g, '/');
 
       scripts += `<script type="text/javascript" src="${scriptUrl}"></script>\r\n`;
     });
