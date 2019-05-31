@@ -1,3 +1,17 @@
+## 0.5.4(2019-06-01)
+
+### Bug Fix
+
+- fix: the dll path problem in windows platform
+
+### Update
+
+nothing
+
+### New Function
+
+nothing
+
 ## 0.5.3(2019-04-11)
 
 ### Bug Fix
