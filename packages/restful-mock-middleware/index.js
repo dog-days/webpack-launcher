@@ -15,15 +15,15 @@ const pathToRegexp = require('path-to-regexp');
 const composeMiddlewares = require('webpack-launcher-utils/expressMiddlewareCompose');
 const consola = require('consola');
 
-let mockFolder = path.resolve('./mock');
+let mockFolder;
 // 文件上传的位置
-let uploadDest = path.resolve(mockFolder, './uploads');
-let mockConfigFile = path.resolve(mockFolder, '.mock.config.js');
-let mockConfigFormatter = function(mockConfig) {
-  return mockConfig;
-};
-// 是否输出日志
+let uploadDest;
+let mockConfigFile;
+let mockConfigFormatter;
+// 是否输出日志，默认 true
 let openLogger;
+// 是否是单页面应用，默认 true
+let isSinglePage;
 
 /**
  * 创建 express mock middleware
@@ -34,22 +34,29 @@ let openLogger;
  * @param {String} options.mockConfigFile 绝对路径 undefined 默认使用当前项目
  * ./mock/.mock.config.js
  * @param {Function} options.mockConfigFormatter 格式化 mockConfigFile 为
- * @param {Function} options.openLogger 是否开启日志
+ * @param {Boolean} options.openLogger 是否开启日志，默认 true
+ * @param {Boolean} options.isSinglePage 是否是单页面应用，默认 true
  */
-function createMockMiddleware(options = { openLogger: true }) {
-  if (options.mockConfigFile) {
-    mockConfigFile = options.mockConfigFile;
-  }
-  if (options.mockFolder) {
-    mockFolder = options.mockFolder;
-  }
-  if (options.uploadDest) {
-    uploadDest = options.uploadDest;
-  }
-  if (options.mockConfigFormatter) {
-    mockConfigFormatter = options.mockConfigFormatter;
-  }
+function createMockMiddleware(options = {}) {
+  mockFolder = path.resolve('./mock');
+
+  const defaultOptions = {
+    mockFolder,
+    uploadDest: path.resolve(mockFolder, './uploads'),
+    mockConfigFile: path.resolve(mockFolder, '.mock.config.js'),
+    mockConfigFormatter: mockConfig => mockConfig,
+    openLogger: true,
+    isSinglePage: true,
+  };
+
+  options = { ...defaultOptions, ...options };
+
+  mockConfigFile = options.mockConfigFile;
+  mockFolder = options.mockFolder;
+  uploadDest = options.uploadDest;
+  mockConfigFormatter = options.mockConfigFormatter;
   openLogger = options.openLogger;
+  isSinglePage = options.isSinglePage;
 
   return function(req, res, next) {
     // 只有 mockConfig 配置文件存在才处理
@@ -101,7 +108,7 @@ function mockMiddleware(req, res, next) {
     next();
     return;
   }
-  const createMockAppInstance = new createMockApp(req, res, next, { openLogger });
+  const createMockAppInstance = new createMockApp(req, res, next, { openLogger, isSinglePage });
   mockConfig(createMockAppInstance.getMockApp());
   createMockAppInstance.run();
 }
@@ -146,8 +153,13 @@ class createMockApp {
 
   getMockApp() {
     const method = this.method;
+    const that = this;
+
     // 不支持 options 和 head
     return {
+      setBaseURL(value) {
+        that.baseURL = value;
+      },
       all: method.bind(this, 'any'),
       get: method.bind(this, 'GET'),
       delete: method.bind(this, 'DELETE'),
@@ -157,18 +169,18 @@ class createMockApp {
     };
   }
 
-  compilePath(path, options) {
+  compilePath(apiPath, options) {
     const cacheKey = `${options.end}${options.strict}${options.sensitive}`;
     const pathCache = cache[cacheKey] || (cache[cacheKey] = {});
 
-    if (pathCache[path]) return pathCache[path];
+    if (pathCache[apiPath]) return pathCache[apiPath];
 
     const keys = [];
-    const regexp = pathToRegexp(path, keys, options);
+    const regexp = pathToRegexp(apiPath, keys, options);
     const result = { regexp, keys };
 
     if (cacheCount < cacheLimit) {
-      pathCache[path] = result;
+      pathCache[apiPath] = result;
       cacheCount++;
     }
 
@@ -178,15 +190,19 @@ class createMockApp {
   /**
    *
    * @param {String} method GET POST DELETE PUT PATCH
-   * @param {String} path mock 路由路径配置
+   * @param {String} apiPath mock 路由路径配置
    */
-  use(method, path, callback) {
+  use(method, apiPath, callback) {
     if (!_.isFunction(callback)) {
       throw new TypeError('Expected the callback to be a funciton.');
     }
 
+    if (this.baseURL) {
+      apiPath = `${this.baseURL}${apiPath}`;
+    }
+
     const currentUrl = this.req.url;
-    const { regexp, keys } = this.compilePath(path, {
+    const { regexp, keys } = this.compilePath(apiPath, {
       end: true,
       strict: false,
       sensitive: true,
@@ -229,6 +245,7 @@ class createMockApp {
         logger.error(...loggerFormator());
       } else {
         try {
+          res.append('Cache-Control', 'no-cache');
           resultCallback(req, res);
           if (res.statusCode >= 200 && res.statusCode < 300) {
             logger.success(...loggerFormator());
@@ -244,7 +261,16 @@ class createMockApp {
       }
     } else {
       this.next();
-      logger.error(...loggerFormator(404));
+      // 如果不是单页面应用，才需要输出 404，
+      // 单页面应用找不到的路径都重写到 index.html 了
+      if (!this.options.isSinglePage) {
+        // 非单页面应用，匹配到 baseURL 才输出 404 日志，否则其他的非 mock 请求在这里全部 404
+        if (this.baseURL && this.baseURL !== '/') {
+          if (req.url.includes(this.baseURL)) {
+            logger.error(...loggerFormator(404));
+          }
+        }
+      }
     }
   }
 }
