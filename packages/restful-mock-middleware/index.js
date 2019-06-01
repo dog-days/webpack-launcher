@@ -13,6 +13,7 @@ const _ = require('lodash');
 const chalk = require('chalk');
 const pathToRegexp = require('path-to-regexp');
 const composeMiddlewares = require('webpack-launcher-utils/expressMiddlewareCompose');
+const consola = require('consola');
 
 let mockFolder = path.resolve('./mock');
 // 文件上传的位置
@@ -21,6 +22,8 @@ let mockConfigFile = path.resolve(mockFolder, '.mock.config.js');
 let mockConfigFormatter = function(mockConfig) {
   return mockConfig;
 };
+// 是否输出日志
+let openLogger;
 
 /**
  * 创建 express mock middleware
@@ -31,9 +34,9 @@ let mockConfigFormatter = function(mockConfig) {
  * @param {String} options.mockConfigFile 绝对路径 undefined 默认使用当前项目
  * ./mock/.mock.config.js
  * @param {Function} options.mockConfigFormatter 格式化 mockConfigFile 为
- * .mock.config.js 的格式
+ * @param {Function} options.openLogger 是否开启日志
  */
-function createMockMiddleware(options = {}) {
+function createMockMiddleware(options = { openLogger: true }) {
   if (options.mockConfigFile) {
     mockConfigFile = options.mockConfigFile;
   }
@@ -46,6 +49,8 @@ function createMockMiddleware(options = {}) {
   if (options.mockConfigFormatter) {
     mockConfigFormatter = options.mockConfigFormatter;
   }
+  openLogger = options.openLogger;
+
   return function(req, res, next) {
     // 只有 mockConfig 配置文件存在才处理
     if (fs.existsSync(mockConfigFile)) {
@@ -77,7 +82,7 @@ function mockMiddleware(req, res, next) {
   if (fs.existsSync(uploadDest)) {
     // 清空上传的文件
     fs.emptyDir(uploadDest, err => {
-      if (err) return console.error(err);
+      if (err) return consola.error(err);
     });
   }
   let mockConfig;
@@ -92,11 +97,11 @@ function mockMiddleware(req, res, next) {
     });
     mockConfig = mockConfigFormatter(require(mockConfigFile));
   } catch (err) {
-    console.log(chalk.red(err.stack));
+    consola.log(chalk.red(err.stack));
     next();
     return;
   }
-  const createMockAppInstance = new createMockApp(req, res, next);
+  const createMockAppInstance = new createMockApp(req, res, next, { openLogger });
   mockConfig(createMockAppInstance.getMockApp());
   createMockAppInstance.run();
 }
@@ -106,22 +111,23 @@ const cacheLimit = 10000;
 let cacheCount = 0;
 
 class createMockApp {
-  constructor(req, res, next) {
+  constructor(req, res, next, options = {}) {
     this.req = req;
-    this.res = this.getRewritedRes(res);
+    this.res = this.getRewritedRes(res, req);
     this.next = next;
-    // 是否已经匹配到 mock api
-    this.hasMatched = false;
+    this.options = options;
     // 每个匹配到的 mock api 都会有一个回调，可以响应内容
-    // 参数为 req 和 res
-    this.resultCallback = undefined;
+    // 结构为 { [method]: [callback] }
+    // callback 参数为 req 和 res
+    this.resultCallbackObj = undefined;
+    this.logger = createLogger({ openLogger: options.openLogger });
   }
   /**
    * 重写 res.json res.jsonp res.send，如果是 plain object 则使用 mockjs 处理
    * @param {Object} res express response 对象
    * @returns {Object} res
    */
-  getRewritedRes(res) {
+  getRewritedRes(res, req) {
     function rewritelWithMockJs(method) {
       const tempResMethod = res[method].bind(res);
       res[method] = function(body) {
@@ -129,6 +135,7 @@ class createMockApp {
           body = mockjs.mock(body);
         }
         tempResMethod(body);
+        req.body = body;
       };
     }
     rewritelWithMockJs('json');
@@ -167,6 +174,7 @@ class createMockApp {
 
     return result;
   }
+
   /**
    *
    * @param {String} method GET POST DELETE PUT PATCH
@@ -176,52 +184,104 @@ class createMockApp {
     if (!_.isFunction(callback)) {
       throw new TypeError('Expected the callback to be a funciton.');
     }
+
+    const currentUrl = this.req.url;
     const { regexp, keys } = this.compilePath(path, {
       end: true,
       strict: false,
       sensitive: true,
     });
-    const match = regexp.exec(this.req.url);
+    const match = regexp.exec(currentUrl);
 
-    if (!match || this.hasMatched) {
+    if (!match) {
       return;
     }
-    // console.log(match, this.hasMatched, regexp, this.req.url.slice(1));
-    this.hasMatched = true;
+
     // eslint-disable-next-line
     const [noop, ...values] = match;
     this.req.params = keys.reduce((memo, key, index) => {
       memo[key.name] = values[index];
       return memo;
     }, {});
+
+    // 在 callback 函数中绑上 method 值
     callback.method = method;
-    return callback;
+    this.resultCallbackObj = {
+      ...this.resultCallbackObj,
+      [method]: callback,
+    };
   }
   method(method = 'GET', ...args) {
-    this.resultCallback = this.resultCallback || this.use(method, ...args);
+    this.use(method, ...args);
   }
   run() {
     const req = this.req;
     const res = this.res;
-    const resultCallback = this.resultCallback;
+    const logger = this.logger;
+    const loggerFormator = statusCode => {
+      return [statusCode || res.statusCode, chalk.cyan(req.method), chalk.grey(req.url)];
+    };
 
-    if (resultCallback) {
-      if (
-        resultCallback.method.toLocaleUpperCase() !== req.method.toLocaleUpperCase() &&
-        resultCallback.method !== 'any'
-      ) {
+    if (this.resultCallbackObj) {
+      const resultCallback = this.resultCallbackObj[req.method] || this.resultCallbackObj['any'];
+      if (!resultCallback) {
         res.sendStatus(405);
+        logger.error(...loggerFormator());
       } else {
         try {
           resultCallback(req, res);
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            logger.success(...loggerFormator());
+          } else {
+            logger.fail(...loggerFormator());
+          }
+          // logger.info(req.body);
         } catch (err) {
           // 语法错误等
           res.status(500).send(err.stack);
+          logger.error(...loggerFormator());
         }
       }
     } else {
       this.next();
+      logger.error(...loggerFormator(404));
     }
+  }
+}
+
+function createLogger(options = { openLogger: true }) {
+  if (openLogger) {
+    const logger = consola.create({
+      defaults: {
+        message: chalk.bgHex('#409EFF').black(' Mock '),
+        badge: true,
+        tag: 'mock',
+      },
+    });
+    logger.fail = function(...args) {
+      logger.log({
+        level: 0,
+        type: 'fail',
+        message: chalk.bgHex('#409EFF').black(' Mock '),
+        args,
+      });
+    };
+    return logger;
+  } else {
+    return {
+      fatal: () => {},
+      error: () => {},
+      warn: () => {},
+      log: () => {},
+      info: () => {},
+      success: () => {},
+      fail: () => {},
+      debug: () => {},
+      trace: () => {},
+      silent: () => {},
+      ready: () => {},
+      start: () => {},
+    };
   }
 }
 
