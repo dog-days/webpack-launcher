@@ -1,0 +1,12 @@
+{
+  "version": "0.5.3",
+  "name": "mock-example",
+  "private": true,
+  "dependencies": {
+    "express": "^4.16.4",
+    "restful-mock-middleware": "^0.5.3"
+  },
+  "scripts": {
+    "mock-server": "node index.js"
+  }
+}
