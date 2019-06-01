@@ -70,9 +70,7 @@ function createMockMiddleware(options = {}) {
 
 /**
  * 创建 mock middleware
- * 有两种 mock 方式（后续会逐渐移除老式的 mock 方式）：
- * 1.老式的文件路径 filePathMock 方式（为了兼容，保留这个用法）
- * 2.新的 routerMock 方式，跟 express 的 router 用法一致，推荐使用这种
+ * 跟 express 的 router 用法一致
  * @return express middleware
  */
 function mockMiddleware(req, res, next) {
@@ -98,43 +96,9 @@ function mockMiddleware(req, res, next) {
     next();
     return;
   }
-
-  if (_.isFunction(mockConfig)) {
-    // next 在 createMockApp 中处理
-    // 这种模式只有 routerMock
-    const mockApp = new createMockApp(req, res, next);
-    mockConfig(mockApp.getMockApp());
-    mockApp.run();
-  } else {
-    // 兼容模式 .mock.config.js 结构
-    // 后续会移除，可以不理会
-    // module.exports = {
-    //   filePathMock: {
-    //     '/keeper/v1/([^?#]*)': '/mock/$1.json',
-    //   },
-    //   routerMock: function(app){},
-    // };
-    const nextWithFilePathMock = function() {
-      // 默认运行 next
-      let shouldRunNext = true;
-      // 匹配到 routerMock 则不再运行 filePathMock
-      if (mockConfig.filePathMock) {
-        // 兼容旧文件路径 mock 模式
-        shouldRunNext = createFilePathMock(mockConfig.filePathMock, mockFolder)(req, res);
-      }
-      if (shouldRunNext) {
-        next();
-      }
-    };
-    if (mockConfig.routerMock) {
-      // routerPathMock 优先级更高
-      const mockApp = new createMockApp(req, res, nextWithFilePathMock);
-      mockConfig.routerMock(mockApp.getMockApp());
-      mockApp.run();
-    } else {
-      nextWithFilePathMock();
-    }
-  }
+  const createMockAppInstance = new createMockApp(req, res, next);
+  mockConfig(createMockAppInstance.getMockApp());
+  createMockAppInstance.run();
 }
 
 const cache = {};
@@ -143,12 +107,14 @@ let cacheCount = 0;
 
 class createMockApp {
   constructor(req, res, next) {
-    this.result = [];
     this.req = req;
     this.res = this.getRewritedRes(res);
     this.next = next;
-    // 是否
+    // 是否已经匹配到 mock api
     this.hasMatched = false;
+    // 每个匹配到的 mock api 都会有一个回调，可以响应内容
+    // 参数为 req 和 res
+    this.resultCallback = undefined;
   }
   /**
    * 重写 res.json res.jsonp res.send，如果是 plain object 则使用 mockjs 处理
@@ -232,22 +198,22 @@ class createMockApp {
     return callback;
   }
   method(method = 'GET', ...args) {
-    this.result.push(this.use(method, ...args));
+    this.resultCallback = this.resultCallback || this.use(method, ...args);
   }
   run() {
     const req = this.req;
     const res = this.res;
-    // 只返回一个匹配的
-    const result = this.result.filter(Boolean)[0];
-    if (result) {
+    const resultCallback = this.resultCallback;
+
+    if (resultCallback) {
       if (
-        result.method.toLocaleUpperCase() !== req.method.toLocaleUpperCase() &&
-        result.method !== 'any'
+        resultCallback.method.toLocaleUpperCase() !== req.method.toLocaleUpperCase() &&
+        resultCallback.method !== 'any'
       ) {
         res.sendStatus(405);
       } else {
         try {
-          result(req, res);
+          resultCallback(req, res);
         } catch (err) {
           // 语法错误等
           res.status(500).send(err.stack);
@@ -257,88 +223,6 @@ class createMockApp {
       this.next();
     }
   }
-}
-
-/**
- * 文件路径 mock 方式，这是老式 mock 方式（支持 mockjs 格式）
- * 包括静态文件 .json，和动态文件 .js 的mock 方式
- * @param { Object } filePathMockConfig 格式如下
- * {
- *   '/keeper/v1/([^?#]*)': '/mock/$1.json',
- *   '/keeper/v2/([^?#]*)': '/mock/$1.json',
- * }
- * @param { String } filePathMockConfig[mockRule] mock规则，可以使正则表达式
- * eg. '/keeper/v2/([^?#]*)'
- * @param { String } filePathMockConfig[moackTarget] mock 目标路径
- * eg. '/mock/$1.json'
- * @param { String } mockFolder 指定的 mock 文件夹路径
- */
-function createFilePathMock(filePathMockConfig, mockFolder) {
-  return function(req, res) {
-    for (let k in filePathMockConfig) {
-      const mockRule = k;
-      let mockTargets = filePathMockConfig[k];
-      if (_.isString(mockTargets)) {
-        mockTargets = [mockTargets];
-      }
-      let mockRegExp = new RegExp(mockRule);
-      try {
-        let status = 200;
-        let targetPath;
-        let match = req.url.match(mockRegExp);
-        if (!match) {
-          return true;
-        }
-        for (let i = 0; i < mockTargets.length; i++) {
-          const mt = mockTargets[i];
-          // eslint-disable-next-line
-          match.forEach((m, k) => {
-            targetPath = mt.replace(`$${k}`, m);
-          });
-          //mock文件路径
-          let mockFilePath = path.join(mockFolder, targetPath);
-          if (fs.existsSync(mockFilePath)) {
-            let mockContents;
-            if (/\.js$/.test(mockFilePath)) {
-              // .js 文件
-              delete require.cache[mockFilePath];
-              mockContents = require(mockFilePath);
-            } else {
-              // .json 文件
-              mockContents = fs.readFileSync(mockFilePath, {
-                encoding: 'utf-8',
-              });
-            }
-            if (_.isFunction(mockContents)) {
-              mockContents = mockContents(req, res);
-            }
-            if (_.isString(mockContents) && mockContents !== '') {
-              try {
-                mockContents = JSON.parse(mockContents);
-              } catch (e) {
-                /**noop**/
-              }
-            }
-            if (!mockContents || mockContents === '') {
-              mockContents = {};
-            }
-            if (_.isPlainObject(mockContents)) {
-              mockContents = mockjs.mock(mockContents);
-            }
-            res.status(status).send(mockContents);
-            return false;
-          }
-        }
-        // 没有返回就默认为 404
-        res.status(404).send(req.url + ' not found.');
-        return false;
-      } catch (e) {
-        res.status(500).send(e.toString());
-        return false;
-      }
-    }
-    return true;
-  };
 }
 
 module.exports = createMockMiddleware;
