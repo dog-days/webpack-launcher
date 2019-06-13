@@ -1,3 +1,19 @@
+## 0.5.4(2019-06-02)
+
+### Bug Fix
+
+- fix: the dll path problem in windows platform
+- fix: the mock bug with the same api path which only work for the first one
+
+### Update
+
+nothing
+
+### New Function
+
+- feature: add log for mock request
+- feature: add baseURL,options.isSinglePage for user custom
+
 ## 0.5.3(2019-04-11)
 
 ### Bug Fix
