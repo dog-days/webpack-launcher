@@ -1,17 +1,19 @@
 'use strict';
 
 module.exports = function(mockApp) {
-  mockApp.get('/keeper/v1/topic', function(req, res) {
+  mockApp.setBaseURL('/keeper/v1');
+
+  mockApp.get('/topic', function(req, res) {
     res.send({ url: req.url, query: req.query });
   });
-  mockApp.post('/keeper/v1/topic', function(req, res) {
+  mockApp.post('/topic', function(req, res) {
     res.send({ url: req.url, query: req.query, body: req.body });
   });
-  mockApp.all('/keeper/v1/topic', function(req, res) {
+  mockApp.all('/topic', function(req, res) {
     // all 优先级低于 get post
     res.send({ all: true, url: req.url, query: req.query, body: req.body });
   });
-  mockApp.patch('/keeper/v1/topic/:id', function(req, res) {
+  mockApp.patch('/topic/:id', function(req, res) {
     res.send({
       url: req.url,
       query: req.query,
@@ -19,7 +21,12 @@ module.exports = function(mockApp) {
       'data|10': [{ 'id|+1': 1 }],
     });
   });
-  mockApp.delete('/keeper/v1/topic/:id', function(req, res) {
+  mockApp.delete('/topic/:id', function(req, res) {
+    res.send({ url: req.url, query: req.query });
+  });
+
+  mockApp.setBaseURL('/keeper/v2');
+  mockApp.delete('/topic/:id', function(req, res) {
     res.send({ url: req.url, query: req.query });
   });
 };
