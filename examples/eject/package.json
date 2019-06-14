@@ -1,13 +1,13 @@
 {
-  "version": "0.5.3",
+  "version": "0.6.0",
   "name": "eject-example",
   "private": true,
   "dependencies": {
-    "restful-mock-middleware": "^0.5.3",
-    "webpack-dev-server-proxy-middlware": "^0.5.3",
-    "webpack-launcher": "^0.5.3",
-    "webpack-launcher-static": "^0.5.3",
-    "webpack-launcher-utils": "^0.5.3"
+    "restful-mock-middleware": "^0.6.0",
+    "webpack-dev-server-proxy-middlware": "^0.6.0",
+    "webpack-launcher": "^0.6.0",
+    "webpack-launcher-static": "^0.6.0",
+    "webpack-launcher-utils": "^0.6.0"
   },
   "scripts": {
     "start": "node ./bin/start.js",
