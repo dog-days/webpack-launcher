@@ -3,6 +3,6 @@
     "examples/*",
     "packages/*"
   ],
-  "version": "0.5.3",
+  "version": "0.6.0",
   "hoist": true
 }
