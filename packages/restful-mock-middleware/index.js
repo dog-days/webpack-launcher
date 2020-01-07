@@ -201,13 +201,12 @@ class createMockApp {
       apiPath = `${this.baseURL}${apiPath}`;
     }
 
-    const currentUrl = this.req.url;
     const { regexp, keys } = this.compilePath(apiPath, {
       end: true,
       strict: false,
       sensitive: true,
     });
-    const match = regexp.exec(currentUrl);
+    const match = regexp.exec(this.req._parsedUrl.pathname);
 
     if (!match) {
       return;
