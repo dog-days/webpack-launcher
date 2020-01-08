@@ -363,6 +363,7 @@ const config = {
             test: sassModuleRegex,
             use: getStyleLoaders(
               {
+                camelCase: true,
                 importLoaders: 2,
                 sourceMap: isEnvProduction && shouldUseSourceMap,
                 modules: true,
@@ -397,12 +398,16 @@ const config = {
             test: lessModuleRegex,
             use: getStyleLoaders(
               {
+                camelCase: true,
                 importLoaders: 2,
                 sourceMap: isEnvProduction && shouldUseSourceMap,
                 modules: true,
                 getLocalIdent: getCSSModuleLocalIdent,
               },
-              'less-loader'
+              'less-loader',
+              {
+                javascriptEnabled: true,
+              }
             ),
           },
           // "file" loader makes sure those assets get served by WebpackDevServer.
